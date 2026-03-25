@@ -552,6 +552,55 @@ async function seedDemo(pepper: string) {
   console.log(`             2 containers, ${dgaShipments.length} DGA labels, 1 rate table, 2 users`);
 }
 
+// ─── Owner seed (SysPaq superadmin) ──────────────────────────────
+
+async function seedOwner(pepper: string) {
+  const tenant = await prisma.tenant.upsert({
+    where: { slug: "syspaq" },
+    create: {
+      slug: "syspaq",
+      name: "SysPaq",
+      casilleroPrefix: "SYS",
+      plan: "ENTERPRISE",
+      planStatus: "ACTIVE",
+    },
+    update: {},
+  });
+
+  const rawKey = `spq_live_${randomBytes(24).toString("base64url")}`;
+  const keyHash = hashApiKey(rawKey, pepper);
+  const keyPrefix = rawKey.slice(0, 16);
+
+  await prisma.apiKey.deleteMany({ where: { tenantId: tenant.id, name: "Owner key" } });
+  await prisma.apiKey.create({
+    data: { tenantId: tenant.id, name: "Owner key", keyHash, keyPrefix, role: "ADMIN" },
+  });
+
+  const ownerEmail = process.env.OWNER_EMAIL ?? "admin@syspaq.com";
+  const ownerPassword = process.env.OWNER_PASSWORD ?? "changeme123!";
+  const passwordHash = await bcryptHash(ownerPassword, 12);
+
+  await prisma.user.upsert({
+    where: { tenantId_email: { tenantId: tenant.id, email: ownerEmail } },
+    create: {
+      tenantId: tenant.id,
+      email: ownerEmail,
+      passwordHash,
+      firstName: "SysPaq",
+      lastName: "Admin",
+      role: "ADMIN",
+      isSuperAdmin: true,
+    },
+    update: { isSuperAdmin: true },
+  });
+
+  console.log("--- Owner Seed OK ---");
+  console.log("Tenant ID:", tenant.id);
+  console.log("Login email:", ownerEmail);
+  console.log("Login tenant: syspaq");
+  console.log("API key (save once):", rawKey);
+}
+
 // ─── Main ────────────────────────────────────────────────────────
 
 async function main() {
@@ -568,6 +617,9 @@ async function main() {
   }
   if (mode === "demo" || mode === "all") {
     await seedDemo(pepper);
+  }
+  if (mode === "owner" || mode === "all") {
+    await seedOwner(pepper);
   }
 }
 

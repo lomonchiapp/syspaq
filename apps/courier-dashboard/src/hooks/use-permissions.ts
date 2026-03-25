@@ -17,10 +17,12 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 
 export function usePermissions() {
   const role = useAuthStore((s) => s.role) ?? "INTEGRATION";
+  const isSuperAdmin = useAuthStore((s) => s.isSuperAdmin) ?? false;
   const allowed = ROLE_PERMISSIONS[role] ?? [];
 
   return {
     role,
+    isSuperAdmin,
     canAccess: (page: string) => allowed.includes(page),
     canManageUsers: role === "ADMIN",
     canManageConfig: role === "ADMIN",

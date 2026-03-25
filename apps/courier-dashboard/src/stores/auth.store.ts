@@ -7,6 +7,7 @@ interface UserInfo {
   firstName: string;
   lastName: string;
   role: string;
+  isSuperAdmin?: boolean;
 }
 
 interface SignupData {
@@ -27,6 +28,7 @@ interface AuthState {
   token: string | null;
   tenantId: string | null;
   role: string | null;
+  isSuperAdmin: boolean;
   user: UserInfo | null;
   isAuthenticated: boolean;
   login: (email: string, password: string, tenant: string) => Promise<void>;
@@ -40,6 +42,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       tenantId: null,
       role: null,
+      isSuperAdmin: false,
       user: null,
       isAuthenticated: false,
 
@@ -74,6 +77,7 @@ export const useAuthStore = create<AuthState>()(
           token: access_token,
           tenantId: payload.tenantId,
           role: payload.role,
+          isSuperAdmin: payload.isSuperAdmin ?? false,
           user,
           isAuthenticated: true,
         });
@@ -115,7 +119,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         localStorage.removeItem("auth-token");
         localStorage.removeItem("auth-tenant-id");
-        set({ token: null, tenantId: null, role: null, user: null, isAuthenticated: false });
+        set({ token: null, tenantId: null, role: null, isSuperAdmin: false, user: null, isAuthenticated: false });
       },
     }),
     {
@@ -124,6 +128,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         tenantId: state.tenantId,
         role: state.role,
+        isSuperAdmin: state.isSuperAdmin,
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),

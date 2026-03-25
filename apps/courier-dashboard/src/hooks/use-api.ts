@@ -898,3 +898,122 @@ export function useRevokeApiKey() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["settings", "api-keys"] }),
   });
 }
+
+/* ------------------------------------------------------------------ */
+/*  Admin (superadmin only)                                            */
+/* ------------------------------------------------------------------ */
+
+export interface AdminTenant {
+  id: string;
+  slug: string;
+  name: string;
+  plan: string;
+  planStatus: string;
+  trialEndsAt: string | null;
+  periodEnd: string | null;
+  adminNotes: string | null;
+  createdAt: string;
+  _count: { customers: number; shipments: number };
+  billingRecords: { amount: number; currency: string; paidAt: string }[];
+}
+
+export interface AdminTenantDetail extends AdminTenant {
+  _count: { customers: number; shipments: number; users: number };
+  billingRecords: BillingRecord[];
+  users: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    isSuperAdmin: boolean;
+    lastLoginAt: string | null;
+    createdAt: string;
+  }[];
+}
+
+export interface BillingRecord {
+  id: string;
+  tenantId: string;
+  amount: number;
+  currency: string;
+  method: string;
+  reference: string | null;
+  notes: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  recordedBy: string;
+  paidAt: string;
+  createdAt: string;
+}
+
+export interface AdminStats {
+  totalTenants: number;
+  byStatus: Record<string, number>;
+  mrrThisMonth: number;
+}
+
+export function useAdminStats() {
+  return useQuery({
+    queryKey: ["admin", "stats"],
+    queryFn: () => api.get<AdminStats>("/v1/admin/stats"),
+  });
+}
+
+export function useAdminTenants() {
+  return useQuery({
+    queryKey: ["admin", "tenants"],
+    queryFn: () => api.get<AdminTenant[]>("/v1/admin/tenants"),
+  });
+}
+
+export function useAdminTenant(id: string) {
+  return useQuery({
+    queryKey: ["admin", "tenants", id],
+    queryFn: () => api.get<AdminTenantDetail>(`/v1/admin/tenants/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useUpdateAdminTenant(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      plan?: string;
+      planStatus?: string;
+      periodEnd?: string;
+      adminNotes?: string;
+    }) => api.patch<AdminTenant>(`/v1/admin/tenants/${id}`, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "tenants"] });
+    },
+  });
+}
+
+export function useRecordPayment(tenantId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      amount: number;
+      currency?: string;
+      method: string;
+      reference?: string;
+      notes?: string;
+      periodStart?: string;
+      periodEnd?: string;
+      paidAt?: string;
+    }) => api.post<BillingRecord>(`/v1/admin/tenants/${tenantId}/payments`, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "tenants", tenantId] });
+      qc.invalidateQueries({ queryKey: ["admin", "tenants"] });
+    },
+  });
+}
+
+export function useAdminRenewals(days = 30) {
+  return useQuery({
+    queryKey: ["admin", "renewals", days],
+    queryFn: () =>
+      api.get<AdminTenant[]>(`/v1/admin/renewals?days=${days}`),
+  });
+}

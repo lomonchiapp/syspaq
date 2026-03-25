@@ -99,12 +99,13 @@ export class AuthService {
     return match;
   }
 
-  issueAccessToken(sub: string, tenantId: string, role: ApiRole, type: "apiKey" | "user" = "apiKey"): string {
+  issueAccessToken(sub: string, tenantId: string, role: ApiRole, type: "apiKey" | "user" = "apiKey", isSuperAdmin = false): string {
     return this.jwt.sign({
       sub,
       tenantId,
       role,
       type,
+      ...(isSuperAdmin ? { isSuperAdmin: true } : {}),
     });
   }
 
@@ -149,7 +150,7 @@ export class AuthService {
       throw new UnauthorizedException("Invalid email or password");
     }
 
-    const accessToken = this.issueAccessToken(user.id, tenantId, user.role, "user");
+    const accessToken = this.issueAccessToken(user.id, tenantId, user.role, "user", user.isSuperAdmin);
 
     // Fire-and-forget lastLogin update
     this.users.updateLastLogin(user.id).catch(() => {});
@@ -164,6 +165,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin,
       },
     };
   }

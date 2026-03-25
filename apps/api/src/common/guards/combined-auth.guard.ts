@@ -17,6 +17,7 @@ export type AuthContext = {
   tenantId: string;
   role: ApiRole;
   via: "jwt" | "apiKey" | "user-jwt";
+  isSuperAdmin?: boolean;
 };
 
 @Injectable()
@@ -45,6 +46,7 @@ export class CombinedAuthGuard implements CanActivate {
           tenantId: string;
           role: ApiRole;
           type?: string;
+          isSuperAdmin?: boolean;
         }>(token);
 
         if (payload.type === "user") {
@@ -53,6 +55,7 @@ export class CombinedAuthGuard implements CanActivate {
             tenantId: payload.tenantId,
             role: payload.role,
             via: "user-jwt",
+            isSuperAdmin: payload.isSuperAdmin ?? false,
           };
         } else {
           req.auth = {

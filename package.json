@@ -13,7 +13,8 @@
     "deploy:api:logs": "./scripts/deploy-api.sh --logs",
     "deploy:api:status": "./scripts/deploy-api.sh --status",
     "seed": "pnpm --filter @syspaq/api prisma:seed",
-    "seed:demo": "pnpm --filter @syspaq/api prisma:seed:demo"
+    "seed:demo": "pnpm --filter @syspaq/api prisma:seed:demo",
+    "seed:owner": "pnpm --filter @syspaq/api prisma:seed:owner"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -25,6 +25,7 @@ import {
   Moon,
   Menu,
   X,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@syspaq/ui";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -102,7 +103,7 @@ function SysPaqLogo({ mode }: { mode: "dark" | "light" }) {
 }
 
 export function Sidebar() {
-  const { canAccess } = usePermissions();
+  const { canAccess, isSuperAdmin } = usePermissions();
   const { mode, toggle } = useThemeStore();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -148,6 +149,34 @@ export function Sidebar() {
             </div>
           );
         })}
+
+        {/* Superadmin section */}
+        {isSuperAdmin && (
+          <div>
+            <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-amber-500/80">
+              Superadmin
+            </p>
+            <ul className="space-y-0.5">
+              <li>
+                <NavLink
+                  to="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                      isActive
+                        ? "bg-amber-500/15 text-amber-400 font-semibold"
+                        : "text-[var(--sidebar-foreground)] hover:bg-amber-500/10"
+                    )
+                  }
+                >
+                  <ShieldCheck className="h-4 w-4 shrink-0" />
+                  <span>Panel Admin</span>
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+        )}
       </nav>
 
       {/* Theme Toggle */}

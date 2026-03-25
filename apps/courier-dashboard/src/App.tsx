@@ -31,6 +31,8 @@ const NotificationsPage = lazy(() => import("@/pages/notifications"));
 const EcommercePage = lazy(() => import("@/pages/ecommerce"));
 const BulkImportPage = lazy(() => import("@/pages/bulk-import"));
 const SettingsPage = lazy(() => import("@/pages/settings"));
+const AdminPage = lazy(() => import("@/pages/admin"));
+const AdminTenantDetailPage = lazy(() => import("@/pages/admin/tenants/[id]"));
 
 function PageLoader() {
   return (
@@ -76,6 +78,8 @@ export default function App() {
               <Route path="ecommerce" element={<EcommercePage />} />
               <Route path="bulk-import" element={<BulkImportPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="admin" element={<AdminPage />} />
+              <Route path="admin/tenants/:id" element={<AdminTenantDetailPage />} />
             </Route>
           </Routes>
         </Suspense>
