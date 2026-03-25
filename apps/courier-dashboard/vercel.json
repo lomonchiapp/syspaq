@@ -1,8 +1,7 @@
 {
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm --filter @blumbox/courier-dashboard build",
-  "outputDirectory": "dist",
   "framework": "vite",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
