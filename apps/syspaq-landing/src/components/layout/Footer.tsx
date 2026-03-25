@@ -1,9 +1,23 @@
 import { Container } from "@/components/ui/Container";
 
-const LINKS = {
-  Producto: ["Funciones", "Precios", "API Docs", "Changelog"],
-  Empresa: ["Nosotros", "Blog", "Carreras", "Contacto"],
-  Legal: ["Privacidad", "Términos", "SLA"],
+const LINKS: Record<string, { label: string; href: string }[]> = {
+  Producto: [
+    { label: "Funciones", href: "#funciones" },
+    { label: "Cómo Funciona", href: "#como-funciona" },
+    { label: "Precios", href: "#precios" },
+    { label: "FAQ", href: "#faq" },
+  ],
+  Recursos: [
+    { label: "Guía de Usuario", href: "#guia" },
+    { label: "Documentación API", href: "https://api.syspaq.com/docs" },
+    { label: "Demo Sandbox", href: "#contacto" },
+    { label: "Contacto", href: "#contacto" },
+  ],
+  Legal: [
+    { label: "Privacidad", href: "#" },
+    { label: "Términos", href: "#" },
+    { label: "SLA", href: "#" },
+  ],
 };
 
 export function Footer() {
@@ -29,12 +43,12 @@ export function Footer() {
               </h4>
               <ul className="mt-4 space-y-3">
                 {items.map((item) => (
-                  <li key={item}>
+                  <li key={item.label}>
                     <a
-                      href="#"
+                      href={item.href}
                       className="text-sm text-surface-500 transition-colors hover:text-primary-400"
                     >
-                      {item}
+                      {item.label}
                     </a>
                   </li>
                 ))}
