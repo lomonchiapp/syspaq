@@ -27,6 +27,7 @@ import { ContainersModule } from "./containers/containers.module";
 import { DgaModule } from "./dga/dga.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { UsersModule } from "./users/users.module";
+import { SettingsModule } from "./settings/settings.module";
 import { AuditModule } from "./common/audit/audit.module";
 import { ProblemJsonExceptionFilter } from "./common/filters/problem-json.filter";
 import { RequestLoggerMiddleware } from "./common/middleware/request-logger.middleware";
@@ -65,6 +66,7 @@ import { RequestLoggerMiddleware } from "./common/middleware/request-logger.midd
     DgaModule,
     AnalyticsModule,
     UsersModule,
+    SettingsModule,
     HealthModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ProblemJsonExceptionFilter }],
