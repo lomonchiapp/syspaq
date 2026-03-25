@@ -22,5 +22,8 @@
       "@prisma/engines",
       "@nestjs/core"
     ]
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
   }
 }

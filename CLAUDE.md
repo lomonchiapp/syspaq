@@ -36,6 +36,7 @@ Run all commands from the monorepo root unless noted.
 | Lint API | `pnpm lint` |
 | Seed all (dev + demo) | `pnpm seed` |
 | Seed demo only | `pnpm seed:demo` |
+| Audit dashboard pages | `node scripts/audit-dashboard.mjs` |
 
 ### API (`apps/api/`)
 
@@ -85,7 +86,9 @@ Copy `.env.example` → `.env`. Required: `DATABASE_URL`, `JWT_SECRET` (≥32 ch
 1. **JWT Bearer** — `Authorization: Bearer <token>` (from `POST /v1/auth/token`)
 2. **API Key** — `X-Api-Key` + `X-Tenant-Id` headers
 
-Routes marked `@Public()` skip auth. Guard populates `req.auth` with `{ apiKeyId, tenantId, role, via }`.
+`POST /v1/auth/token` accepts either an API key (`{ apiKey, tenantId }`) or email/password credentials (`{ email, password, tenantId }`). The `User` model (managed by `users` module) stores bcrypt-hashed passwords.
+
+Routes marked `@Public()` skip auth. Guard populates `req.auth` with `{ apiKeyId, userId, tenantId, role, via }`.
 
 ### Multi-tenancy
 All queries filter by `tenantId` from `req.auth`. No cross-tenant data access.
@@ -150,6 +153,7 @@ The seed script (`prisma/seed.ts`) creates a "demo" tenant with realistic data. 
 **Demo credentials (fixed, deterministic):**
 - Tenant ID: `demo`
 - API Key: `spq_demo_syspaq-sandbox-2025`
+- User login: `admin@syspaq-demo.com` / `demo1234`
 
 **Data created:** 8 customers, 21 shipments (across all phases), 4 branches (Miami warehouse, SDQ office, STI pickup, AILA sorting center), 2 containers (sea + air), DGA labels, invoices with payments, delivery orders, pre-alerts, post-alerts, rate table, notification templates.
 

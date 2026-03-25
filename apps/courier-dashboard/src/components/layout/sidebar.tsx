@@ -93,14 +93,7 @@ const NAV_SECTIONS: NavSection[] = [
 
 function SysPaqLogo() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--sidebar-accent)]">
-        <span className="font-display text-sm font-bold text-white">S</span>
-      </div>
-      <span className="font-display text-lg font-bold text-[var(--sidebar-foreground)]">
-        Sys<span className="text-[var(--sidebar-accent)]">Paq</span>
-      </span>
-    </div>
+    <img src="/logo-white.png" alt="SysPaq" className="h-7 w-auto" />
   );
 }
 

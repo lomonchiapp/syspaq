@@ -122,7 +122,7 @@ export default function ContainerDetailPage() {
             <h1 className="text-2xl font-bold font-mono">{container.number}</h1>
             <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
               Tipo: {container.type} &bull; {container.totalPieces} pieza{container.totalPieces !== 1 && "s"}
-              {container.totalWeightLbs != null && ` &bull; ${container.totalWeightLbs.toFixed(2)} lbs`}
+              {container.totalWeightLbs != null && ` &bull; ${Number(container.totalWeightLbs).toFixed(2)} lbs`}
             </p>
           </div>
 
@@ -214,7 +214,7 @@ export default function ContainerDetailPage() {
                         {pkg.trackingNumber}
                       </td>
                       <td className="py-2">{pkg.customerName || "—"}</td>
-                      <td className="py-2 text-right">{pkg.weightLbs?.toFixed(2) ?? "—"}</td>
+                      <td className="py-2 text-right">{Number(pkg.weightLbs)?.toFixed(2) ?? "—"}</td>
                       <td className="py-2 text-[var(--muted-foreground)]">
                         {pkg.description || "—"}
                       </td>

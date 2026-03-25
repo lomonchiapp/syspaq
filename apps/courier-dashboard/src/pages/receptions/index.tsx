@@ -22,14 +22,14 @@ const columns: Column<Reception>[] = [
   {
     key: "weightLbs",
     header: "Peso (lbs)",
-    render: (r) => (r.weightLbs != null ? `${r.weightLbs.toFixed(2)} lbs` : "—"),
+    render: (r) => (r.weightLbs != null ? `${Number(r.weightLbs).toFixed(2)} lbs` : "—"),
     className: "text-right",
   },
   {
     key: "volumetricWeight",
     header: "Peso Vol.",
     render: (r) =>
-      r.volumetricWeight != null ? `${r.volumetricWeight.toFixed(2)}` : "—",
+      r.volumetricWeight != null ? `${Number(r.volumetricWeight).toFixed(2)}` : "—",
     className: "text-right",
   },
   {

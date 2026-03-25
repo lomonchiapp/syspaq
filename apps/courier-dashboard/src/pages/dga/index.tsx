@@ -59,7 +59,7 @@ const columns: Column<DgaLabelItem>[] = [
   {
     key: "weightLbs",
     header: "Peso (lbs)",
-    render: (r) => r.weightLbs?.toFixed(2) ?? "—",
+    render: (r) => Number(r.weightLbs)?.toFixed(2) ?? "—",
     className: "text-right",
   },
   {

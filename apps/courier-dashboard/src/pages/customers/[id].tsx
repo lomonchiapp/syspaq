@@ -175,7 +175,7 @@ function ReceptionsTab({ customerId }: { customerId: string }) {
     <MiniTable headers={["Peso (lbs)", "Cargos", "Estado", "Fecha"]} isEmpty={receptions.length === 0}>
       {receptions.map((r: Reception) => (
         <tr key={r.id} className="border-t border-[var(--border)]">
-          <td className="px-3 py-2 text-sm">{r.weightLbs?.toFixed(2) ?? "—"}</td>
+          <td className="px-3 py-2 text-sm">{Number(r.weightLbs)?.toFixed(2) ?? "—"}</td>
           <td className="px-3 py-2 text-sm font-semibold">
             {formatCurrency(r.totalCharge, r.currency)}
           </td>

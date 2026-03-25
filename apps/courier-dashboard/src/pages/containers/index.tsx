@@ -62,7 +62,7 @@ const columns: Column<Container>[] = [
     key: "totalWeightLbs",
     header: "Peso (lbs)",
     render: (c) =>
-      c.totalWeightLbs != null ? `${c.totalWeightLbs.toFixed(2)}` : "—",
+      c.totalWeightLbs != null ? `${Number(c.totalWeightLbs).toFixed(2)}` : "—",
     className: "text-right",
   },
   {

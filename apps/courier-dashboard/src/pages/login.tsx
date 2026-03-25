@@ -3,18 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { Mail, Lock, Building2, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
+import { useThemeStore } from "@/stores/theme.store";
 import { cn } from "@syspaq/ui";
 
 function SysPaqLogo() {
+  const { mode } = useThemeStore();
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]">
-        <span className="font-display text-lg font-bold text-white">S</span>
-      </div>
-      <span className="font-display text-2xl font-bold text-[var(--card-foreground)]">
-        Sys<span className="text-[var(--primary)]">Paq</span>
-      </span>
-    </div>
+    <img
+      src={mode === "dark" ? "/logo-white.png" : "/logo.png"}
+      alt="SysPaq"
+      className="h-10 w-auto"
+    />
   );
 }
 

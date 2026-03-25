@@ -33,13 +33,8 @@ export function Navbar() {
     >
       <Container className="flex h-16 items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500">
-            <span className="font-display text-sm font-bold text-white">S</span>
-          </div>
-          <span className="font-display text-xl font-bold">
-            Sys<span className="text-primary-400">Paq</span>
-          </span>
+        <a href="#">
+          <img src="/logo-white.png" alt="SysPaq" className="h-7 w-auto" />
         </a>
 
         {/* Desktop Nav */}

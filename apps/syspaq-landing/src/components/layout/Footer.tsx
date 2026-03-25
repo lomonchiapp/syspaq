@@ -13,13 +13,8 @@ export function Footer() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500">
-                <span className="font-display text-sm font-bold text-white">S</span>
-              </div>
-              <span className="font-display text-xl font-bold">
-                Sys<span className="text-primary-400">Paq</span>
-              </span>
+            <div>
+              <img src="/logo-white.png" alt="SysPaq" className="h-7 w-auto" />
             </div>
             <p className="mt-4 text-sm text-surface-400 leading-relaxed">
               La plataforma todo-en-uno para couriers internacionales en Latinoamérica.
