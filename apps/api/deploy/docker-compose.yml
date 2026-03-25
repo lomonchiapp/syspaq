@@ -27,6 +27,7 @@ services:
         condition: service_healthy
     networks:
       - blumbox_net
+      - redroid_default   # Para que nginx de redroid haga proxy a api.syspaq.com
     restart: unless-stopped
 
   postgres:
@@ -49,6 +50,8 @@ services:
 networks:
   blumbox_net:
     name: blumbox_api_isolated
+  redroid_default:
+    external: true
 
 volumes:
   blumbox_pgdata:
