@@ -44,7 +44,9 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - syspaq_net
+      syspaq_net:
+        aliases:
+          - syspaq-db
     restart: unless-stopped
 
 networks:
