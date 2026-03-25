@@ -102,7 +102,8 @@ async function seedDemo(pepper: string) {
     }),
   ]);
 
-  const [miamiBranch, sdqBranch, stiBranch] = branches;
+  const [miamiBranch, _sdqBranch, _stiBranch] = branches;
+  void _sdqBranch; void _stiBranch;
 
   // ── Customers ──
   const passwordHash = await bcryptHash("demo1234", 12);
@@ -138,13 +139,13 @@ async function seedDemo(pepper: string) {
   // Reset casillero counter
   await prisma.tenant.update({ where: { id: tenant.id }, data: { casilleroCounter: 0 } });
 
-  const customers = [];
+  const customers: Array<{ id: string; firstName: string; lastName: string; idNumber: string | null }> = [];
   for (const c of customersData) {
-    const counter = customers.length + 1;
+    const idx = customers.length + 1;
     const customer = await prisma.customer.create({
       data: {
         tenantId: tenant.id,
-        casillero: `SPQ-${String(counter).padStart(5, "0")}`,
+        casillero: `SPQ-${String(idx).padStart(5, "0")}`,
         email: c.email,
         passwordHash,
         firstName: c.firstName,
@@ -152,7 +153,7 @@ async function seedDemo(pepper: string) {
         phone: c.phone,
         idType: c.idType,
         idNumber: c.idNumber,
-        address: { street: "Calle Demo #" + counter, city: "Santo Domingo", country: "DO" },
+        address: { street: "Calle Demo #" + idx, city: "Santo Domingo", country: "DO" },
       },
     });
     customers.push(customer);
@@ -160,7 +161,7 @@ async function seedDemo(pepper: string) {
   await prisma.tenant.update({ where: { id: tenant.id }, data: { casilleroCounter: customers.length } });
 
   // ── Rate Table ──
-  const rateTable = await prisma.rateTable.create({
+  await prisma.rateTable.create({
     data: {
       tenantId: tenant.id, name: "Tarifa Estándar Miami → RD", originZone: "US-FL", destZone: "DO",
       isDefault: true,
