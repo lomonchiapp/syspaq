@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ApiKey, ApiRole } from "@prisma/client";
 import { randomBytes } from "crypto";
+import * as bcrypt from "bcryptjs";
 import { PrismaService } from "@/prisma/prisma.service";
 import { UsersService } from "@/users/users.service";
 import { hashApiKey, safeEqualHex } from "@/common/crypto/api-key-hash";
@@ -47,12 +48,16 @@ export class AuthService {
         },
       });
 
-      await this.users.create(t.id, {
-        email: dto.email,
-        password: dto.password,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        role: ApiRole.ADMIN,
+      const passwordHash = await bcrypt.hash(dto.password, 12);
+      await tx.user.create({
+        data: {
+          tenantId: t.id,
+          email: dto.email.toLowerCase().trim(),
+          passwordHash,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          role: ApiRole.ADMIN,
+        },
       });
 
       return t;
