@@ -39,7 +39,7 @@ export class DgaController {
     const label = await this.dga.create(this.tenantId(req), dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "dga.create",
       resource: "dgaLabel",
@@ -74,7 +74,7 @@ export class DgaController {
     const label = await this.dga.update(this.tenantId(req), id, dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "dga.update",
       resource: "dgaLabel",
@@ -95,7 +95,7 @@ export class DgaController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "dga.generateForContainer",
       resource: "container",
@@ -118,7 +118,7 @@ export class DgaController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "dga.bulkUpdateStatus",
       resource: "dgaLabel",

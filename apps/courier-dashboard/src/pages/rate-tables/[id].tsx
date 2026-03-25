@@ -9,7 +9,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { cn, formatCurrency } from "@blumbox/ui";
+import { cn, formatCurrency } from "@syspaq/ui";
 import {
   useRateTableDetail,
   useAddTier,

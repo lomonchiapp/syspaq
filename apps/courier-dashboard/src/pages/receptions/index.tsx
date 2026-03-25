@@ -5,7 +5,7 @@ import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatCurrency, formatDateTime } from "@blumbox/ui";
+import { formatCurrency, formatDateTime } from "@syspaq/ui";
 import { useReceptions } from "@/hooks/use-api";
 import type { Reception } from "@/types/api";
 

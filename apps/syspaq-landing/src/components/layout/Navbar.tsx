@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 

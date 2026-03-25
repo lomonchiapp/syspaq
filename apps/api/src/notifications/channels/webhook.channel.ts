@@ -21,8 +21,8 @@ export class WebhookChannel {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Blumbox-Event": event,
-          "X-Blumbox-Signature": `sha256=${signature}`,
+          "X-SysPaq-Event": event,
+          "X-SysPaq-Signature": `sha256=${signature}`,
         },
         body: bodyStr,
         signal: AbortSignal.timeout(10_000),

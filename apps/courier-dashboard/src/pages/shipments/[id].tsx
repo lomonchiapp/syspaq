@@ -11,7 +11,7 @@ import {
   ExternalLink,
   Truck,
 } from "lucide-react";
-import { cn, formatDateTime, formatDate } from "@blumbox/ui";
+import { cn, formatDateTime, formatDate } from "@syspaq/ui";
 import { useShipmentDetail, useShipmentEvents } from "@/hooks/use-api";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailCard } from "@/components/shared/detail-card";

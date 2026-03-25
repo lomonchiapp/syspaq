@@ -4,7 +4,7 @@ La API usa el tipo de contenido `application/problem+json` (RFC 7807) para mucho
 
 ```json
 {
-  "type": "https://api.blumbox.do/problems/404",
+  "type": "https://api.syspaq.com/problems/404",
   "title": "Not Found",
   "status": 404,
   "detail": "Shipment not found",

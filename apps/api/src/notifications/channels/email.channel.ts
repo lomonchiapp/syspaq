@@ -42,7 +42,7 @@ export class EmailChannel {
       const from =
         this.config.get<string>("SMTP_FROM") ||
         this.config.get<string>("SMTP_USER") ||
-        "noreply@blumbox.io";
+        "noreply@syspaq.com";
 
       await this.transporter.sendMail({
         from,

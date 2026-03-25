@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatDate } from "@blumbox/ui";
+import { formatDate } from "@syspaq/ui";
 import { useContainers } from "@/hooks/use-api";
 import type { Container } from "@/types/api";
 

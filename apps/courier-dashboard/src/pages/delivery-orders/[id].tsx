@@ -18,7 +18,7 @@ import {
   RotateCcw,
   XCircle,
 } from "lucide-react";
-import { cn, formatDate, formatDateTime } from "@blumbox/ui";
+import { cn, formatDate, formatDateTime } from "@syspaq/ui";
 import {
   useDeliveryOrderDetail,
   useAssignDriver,

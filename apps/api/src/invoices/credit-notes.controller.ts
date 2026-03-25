@@ -35,7 +35,7 @@ export class CreditNotesController {
     const result = await this.creditNotes.create(this.tenantId(req), dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "CREATE",
       resource: "CreditNote",
@@ -61,7 +61,7 @@ export class CreditNotesController {
     const result = await this.creditNotes.issue(this.tenantId(req), id);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "ISSUE",
       resource: "CreditNote",

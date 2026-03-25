@@ -26,7 +26,7 @@ export class BulkImportController {
   }
 
   private createdBy(req: Request): string {
-    return req.auth!.apiKeyId ?? "unknown";
+    return (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "unknown";
   }
 
   @Post("customers")

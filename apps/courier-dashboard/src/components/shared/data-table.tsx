@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { PackageOpen } from "lucide-react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 import { Skeleton } from "@/components/shared/loading-skeleton";
 
 /* ------------------------------------------------------------------ */

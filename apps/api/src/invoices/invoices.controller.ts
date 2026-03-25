@@ -39,7 +39,7 @@ export class InvoicesController {
     const result = await this.invoices.create(this.tenantId(req), dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "CREATE",
       resource: "Invoice",
@@ -85,7 +85,7 @@ export class InvoicesController {
     const result = await this.invoices.update(this.tenantId(req), id, dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "UPDATE",
       resource: "Invoice",
@@ -104,7 +104,7 @@ export class InvoicesController {
     const result = await this.invoices.addItem(this.tenantId(req), id, dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "ADD_ITEM",
       resource: "Invoice",
@@ -127,7 +127,7 @@ export class InvoicesController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "REMOVE_ITEM",
       resource: "Invoice",
@@ -143,7 +143,7 @@ export class InvoicesController {
     const result = await this.invoices.issue(this.tenantId(req), id);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "ISSUE",
       resource: "Invoice",
@@ -158,7 +158,7 @@ export class InvoicesController {
     const result = await this.invoices.cancel(this.tenantId(req), id);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "CANCEL",
       resource: "Invoice",
@@ -173,7 +173,7 @@ export class InvoicesController {
     const result = await this.invoices.void(this.tenantId(req), id);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "VOID",
       resource: "Invoice",
@@ -195,7 +195,7 @@ export class InvoicesController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "GENERATE_FROM_RECEPTIONS",
       resource: "Invoice",

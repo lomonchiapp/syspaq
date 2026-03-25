@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, createContext, useContext, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, XCircle, Info, X } from "lucide-react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */

@@ -1,12 +1,12 @@
-# Blumbox API en Hostinger Docker (proyecto aparte)
+# SysPaq API en Hostinger Docker (proyecto aparte)
 
-Objetivo: **un proyecto Compose nuevo** (`blumbox-api`) que **no comparte** red ni volúmenes con **redroid** ni otros stacks.
+Objetivo: **un proyecto Compose nuevo** (`syspaq-api`) que **no comparte** red ni volúmenes con **redroid** ni otros stacks.
 
 ## Archivos
 
 | Archivo | Uso |
 |--------|-----|
-| `docker-compose.yml` | Servicios `api` + `postgres`, red `blumbox_api_isolated`, API en `127.0.0.1:3001` |
+| `docker-compose.yml` | Servicios `api` + `postgres`, red `syspaq_api_isolated`, API en `127.0.0.1:3001` |
 | `Dockerfile` | Build de la API desde la **raíz del monorepo** |
 | `.env.release.example` | Plantilla solo para variables **Docker** (DB, JWT, etc.) |
 | `.vps-connection.example` | Plantilla para **SSH** (host/usuario); no mezclar con `.env.release` |
@@ -14,8 +14,8 @@ Objetivo: **un proyecto Compose nuevo** (`blumbox-api`) que **no comparte** red 
 
 ## En el panel (Docker Manager)
 
-1. **Compose** → crear **nuevo proyecto** (nombre distinto a `redroid`, p. ej. `blumbox-api`).
-2. Sube o clona el repo en el VPS en una ruta **dedicada**, p. ej. **`/opt/blumbox`** (no uses `/opt/redroid/`). Lee [`SERVER-SAFETY.md`](./SERVER-SAFETY.md).
+1. **Compose** → crear **nuevo proyecto** (nombre distinto a `redroid`, p. ej. `syspaq-api`).
+2. Sube o clona el repo en el VPS en una ruta **dedicada**, p. ej. **`/opt/syspaq`** (no uses `/opt/redroid/`). Lee [`SERVER-SAFETY.md`](./SERVER-SAFETY.md).
 3. En `apps/api/deploy/`:
 
    - **`.env.release`**: solo variables que consumen los contenedores (`DATABASE_URL`, `JWT_SECRET`, `POSTGRES_PASSWORD`, etc.). **No** pongas aquí contraseña SSH: el `env_file` del servicio `api` inyectaría todo en el contenedor.

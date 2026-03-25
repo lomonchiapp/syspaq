@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
-import { formatDateTime } from "@blumbox/ui";
+import { formatDateTime } from "@syspaq/ui";
 import {
   useBulkImports,
   useBulkImportDetail,

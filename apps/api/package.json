@@ -1,8 +1,8 @@
 {
-  "name": "@blumbox/api",
+  "name": "@syspaq/api",
   "version": "0.1.0",
   "private": true,
-  "description": "Blumbox Courier REST API — multi-tenant tracking",
+  "description": "SysPaq Courier REST API — multi-tenant tracking",
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",

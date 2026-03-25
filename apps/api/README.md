@@ -1,4 +1,4 @@
-# @blumbox/api
+# @syspaq/api
 
 API HTTP REST (JSON) multi-tenant para **tracking de envíos** con eventos append-only, OpenAPI y autenticación por **API key** o **JWT** (intercambio vía `POST /v1/auth/token`).
 
@@ -18,7 +18,7 @@ pnpm prisma:generate
 pnpm exec prisma db seed
 ```
 
-El seed crea un tenant `blumbox` y muestra una **API key** de desarrollo (guárdala; no se vuelve a mostrar).
+El seed crea un tenant `syspaq-dev` y muestra una **API key** de desarrollo (guárdala; no se vuelve a mostrar).
 
 ## Scripts
 
@@ -64,4 +64,4 @@ Todas las rutas de negocio bajo prefijo `/v1/`. Política de deprecación: docum
 ## Multi-courier
 
 Cada registro de negocio incluye `tenantId`. Nuevos couriers = nuevo `Tenant` + API keys; mismo despliegue, datos aislados por tenant.
-# blumboxapi
+# syspaqapi

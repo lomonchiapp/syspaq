@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { useCreateInvoice } from "@/hooks/use-api";
-import { formatCurrency } from "@blumbox/ui";
+import { formatCurrency } from "@syspaq/ui";
 
 interface CreateInvoiceDialogProps {
   open: boolean;

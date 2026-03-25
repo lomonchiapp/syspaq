@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 interface PaginationProps {
   page: number;

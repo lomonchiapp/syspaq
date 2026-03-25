@@ -149,7 +149,7 @@ importers:
 
   apps/courier-dashboard:
     dependencies:
-      '@blumbox/ui':
+      '@syspaq/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tanstack/react-query':
@@ -204,7 +204,7 @@ importers:
 
   apps/syspaq-landing:
     dependencies:
-      '@blumbox/ui':
+      '@syspaq/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       lucide-react:

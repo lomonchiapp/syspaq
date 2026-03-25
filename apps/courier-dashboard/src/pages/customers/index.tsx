@@ -6,7 +6,7 @@ import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatDate } from "@blumbox/ui";
+import { formatDate } from "@syspaq/ui";
 import { useCustomers } from "@/hooks/use-api";
 import { CreateCustomerDialog } from "./create-customer-dialog";
 import type { Customer } from "@/types/api";

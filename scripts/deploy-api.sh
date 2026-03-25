@@ -23,7 +23,7 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 CONN_FILE="$ROOT_DIR/apps/api/deploy/.vps-connection.env"
 
 # Ruta del monorepo en el VPS
-REMOTE_DIR="/opt/blumbox"
+REMOTE_DIR="/opt/syspaq"
 COMPOSE_FILE="apps/api/deploy/docker-compose.yml"
 ENV_FILE="apps/api/deploy/.env.release"
 

@@ -1,4 +1,4 @@
-# Primeros pasos (API Blumbox)
+# Primeros pasos (API SysPaq)
 
 ## 1. Variables de entorno
 

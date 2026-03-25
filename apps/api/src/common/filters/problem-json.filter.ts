@@ -44,7 +44,7 @@ export class ProblemJsonExceptionFilter implements ExceptionFilter {
     }
 
     const problem = {
-      type: `https://api.blumbox.do/problems/${status}`,
+      type: `https://api.syspaq.com/problems/${status}`,
       title,
       status,
       detail: detail ?? title,

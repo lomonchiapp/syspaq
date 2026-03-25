@@ -12,7 +12,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
-import { formatDateTime } from "@blumbox/ui";
+import { formatDateTime } from "@syspaq/ui";
 import {
   useNotificationTemplates,
   useCreateTemplate,

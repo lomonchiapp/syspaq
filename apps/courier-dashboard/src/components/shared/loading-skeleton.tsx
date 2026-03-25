@@ -1,4 +1,4 @@
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 export function Skeleton({ className }: { className?: string }) {
   return (

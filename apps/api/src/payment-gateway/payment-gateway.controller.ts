@@ -98,7 +98,7 @@ export class PaymentIntentsController {
     const result = await this.gateway.cancel(this.tenantId(req), id);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "CANCEL",
       resource: "PaymentIntent",

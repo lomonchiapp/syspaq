@@ -1,12 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+interface UserInfo {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 interface AuthState {
   token: string | null;
   tenantId: string | null;
   role: string | null;
+  user: UserInfo | null;
   isAuthenticated: boolean;
-  login: (apiKey: string, tenantId: string) => Promise<void>;
+  login: (email: string, password: string, tenant: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -16,21 +25,19 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       tenantId: null,
       role: null,
+      user: null,
       isAuthenticated: false,
 
-      login: async (apiKey: string, tenantId: string) => {
-        // First set tenant for the API call
-        localStorage.setItem("auth-tenant-id", tenantId);
-
+      login: async (email: string, password: string, tenant: string) => {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3001"}/v1/auth/token`,
+          `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3001"}/v1/auth/login`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-Tenant-Id": tenantId,
+              "X-Tenant-Id": tenant,
             },
-            body: JSON.stringify({ apiKey }),
+            body: JSON.stringify({ email, password }),
           }
         );
 
@@ -40,17 +47,19 @@ export const useAuthStore = create<AuthState>()(
         }
 
         const data = await res.json();
+        const { access_token, user } = data;
 
-        // Decode JWT to get role
-        const payload = JSON.parse(atob(data.access_token.split(".")[1]));
+        // Decode JWT to get tenantId (resolved UUID)
+        const payload = JSON.parse(atob(access_token.split(".")[1]));
 
-        localStorage.setItem("auth-token", data.access_token);
-        localStorage.setItem("auth-tenant-id", tenantId);
+        localStorage.setItem("auth-token", access_token);
+        localStorage.setItem("auth-tenant-id", payload.tenantId);
 
         set({
-          token: data.access_token,
-          tenantId,
+          token: access_token,
+          tenantId: payload.tenantId,
           role: payload.role,
+          user,
           isAuthenticated: true,
         });
       },
@@ -58,7 +67,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         localStorage.removeItem("auth-token");
         localStorage.removeItem("auth-tenant-id");
-        set({ token: null, tenantId: null, role: null, isAuthenticated: false });
+        set({ token: null, tenantId: null, role: null, user: null, isAuthenticated: false });
       },
     }),
     {
@@ -67,6 +76,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         tenantId: state.tenantId,
         role: state.role,
+        user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
     }

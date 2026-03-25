@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 interface InfoItem {
   label: string;

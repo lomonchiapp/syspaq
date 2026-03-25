@@ -1,5 +1,5 @@
 # Build desde la raíz del monorepo:
-#   docker build -f apps/api/deploy/Dockerfile -t blumbox-api .
+#   docker build -f apps/api/deploy/Dockerfile -t syspaq-api .
 #
 # La API no depende de otros workspaces; solo hace falta la raíz pnpm + apps/api.
 
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api ./apps/api
 
-RUN pnpm install --frozen-lockfile --filter @blumbox/api...
+RUN pnpm install --frozen-lockfile --filter @syspaq/api...
 
 WORKDIR /app/apps/api
 ENV NODE_ENV=production

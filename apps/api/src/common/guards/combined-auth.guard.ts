@@ -12,10 +12,11 @@ import { AuthService } from "@/auth/auth.service";
 import { IS_PUBLIC_KEY } from "@/common/decorators/public.decorator";
 
 export type AuthContext = {
-  apiKeyId: string;
+  apiKeyId?: string;
+  userId?: string;
   tenantId: string;
   role: ApiRole;
-  via: "jwt" | "apiKey";
+  via: "jwt" | "apiKey" | "user-jwt";
 };
 
 @Injectable()
@@ -43,13 +44,24 @@ export class CombinedAuthGuard implements CanActivate {
           sub: string;
           tenantId: string;
           role: ApiRole;
+          type?: string;
         }>(token);
-        req.auth = {
-          apiKeyId: payload.sub,
-          tenantId: payload.tenantId,
-          role: payload.role,
-          via: "jwt",
-        };
+
+        if (payload.type === "user") {
+          req.auth = {
+            userId: payload.sub,
+            tenantId: payload.tenantId,
+            role: payload.role,
+            via: "user-jwt",
+          };
+        } else {
+          req.auth = {
+            apiKeyId: payload.sub,
+            tenantId: payload.tenantId,
+            role: payload.role,
+            via: "jwt",
+          };
+        }
         return true;
       } catch {
         throw new UnauthorizedException("Invalid or expired token");

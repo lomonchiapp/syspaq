@@ -14,7 +14,7 @@ Objetivo: **aislar** la API (y opcionalmente PostgreSQL) del resto de procesos y
 En ambos casos el **aislamiento real** viene de:
 
 1. **Escuchar solo en `127.0.0.1`** (no en `0.0.0.0`) para el puerto de la API, y que **solo Nginx/Caddy** hable con Internet en 443.
-2. **PostgreSQL** con usuario/contraseña dedicados y base de datos solo para Blumbox (o instancia en contenedor con red interna).
+2. **PostgreSQL** con usuario/contraseña dedicados y base de datos solo para SysPaq (o instancia en contenedor con red interna).
 3. **Firewall** (`ufw` o reglas del proveedor): abiertos 22 (SSH), 80 y 443; el resto cerrado o solo red interna.
 
 Así **no “ensucias”** el resto del servidor: otros servicios siguen en sus puertos o contenedores.
@@ -41,7 +41,7 @@ La app no necesita puerto público directo: solo el proxy en 443.
 
 ## Opción Docker (si ya tienes contenedores)
 
-- Usa un **compose** con **red bridge propia** (`blumbox_net`) para no mezclar con stacks existentes.
+- Usa un **compose** con **red bridge propia** (`syspaq_net`) para no mezclar con stacks existentes.
 - Publica la API como `127.0.0.1:3001:3001` (solo localhost del host) y el mismo Nginx del host hace proxy a ese puerto.
 - PostgreSQL: o bien **contenedor solo en red interna** (sin puerto al host), o **Postgres ya instalado** en el VPS con un usuario/DB dedicados (a menudo más simple en producción).
 
@@ -49,9 +49,9 @@ En el repo hay un ejemplo opcional: [`deploy/docker-compose.example.yml`](../dep
 
 ### Hostinger Docker Manager (proyecto nuevo, sin mezclar con otros stacks)
 
-En el panel puedes crear un **proyecto Compose aparte** (p. ej. `blumbox-api`) para no tocar stacks como **redroid**:
+En el panel puedes crear un **proyecto Compose aparte** (p. ej. `syspaq-api`) para no tocar stacks como **redroid**:
 
-- Compose listo: [`deploy/docker-compose.yml`](../deploy/docker-compose.yml) — red aislada `blumbox_api_isolated`, Postgres propio, API solo en **`127.0.0.1:3001`**.
+- Compose listo: [`deploy/docker-compose.yml`](../deploy/docker-compose.yml) — red aislada `syspaq_api_isolated`, Postgres propio, API solo en **`127.0.0.1:3001`**.
 - Plantilla de variables: [`deploy/.env.release.example`](../deploy/.env.release.example) → en el VPS copiar a **`.env.release`** (ese archivo **no** debe subirse a git).
 - Pasos detallados: [`deploy/README-hostinger.md`](../deploy/README-hostinger.md).
 
@@ -72,19 +72,19 @@ En el panel puedes crear un **proyecto Compose aparte** (p. ej. `blumbox-api`) p
 
 ## Ejemplo systemd (API solo en localhost)
 
-Archivo `/etc/systemd/system/blumbox-api.service` (ajusta rutas y usuario):
+Archivo `/etc/systemd/system/syspaq-api.service` (ajusta rutas y usuario):
 
 ```ini
 [Unit]
-Description=Blumbox API
+Description=SysPaq API
 After=network.target
 
 [Service]
 Type=simple
 User=deploy
-WorkingDirectory=/opt/blumbox/apps/api
+WorkingDirectory=/opt/syspaq/apps/api
 Environment=NODE_ENV=production
-EnvironmentFile=/opt/blumbox/apps/api/.env
+EnvironmentFile=/opt/syspaq/apps/api/.env
 ExecStart=/usr/bin/node dist/main.js
 Restart=on-failure
 # Opcional: límites para no afectar al resto del servidor

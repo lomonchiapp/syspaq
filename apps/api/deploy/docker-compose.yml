@@ -1,13 +1,13 @@
-# Proyecto independiente "blumbox-api" — no mezclar con redroid u otros stacks.
+# Proyecto independiente "syspaq-api" — no mezclar con redroid u otros stacks.
 # En Hostinger Docker Manager: Compose → nuevo proyecto → apuntar a esta carpeta.
 #
-# Desde la raíz del monorepo (blumbox/):
+# Desde la raíz del monorepo (syspaq/):
 #   docker compose -f apps/api/deploy/docker-compose.yml --env-file apps/api/deploy/.env.release up -d --build
 #
-# O en el VPS, con el repo clonado en /opt/blumbox:
-#   cd /opt/blumbox && docker compose -f apps/api/deploy/docker-compose.yml --env-file apps/api/deploy/.env.release up -d --build
+# O en el VPS, con el repo clonado en /opt/syspaq:
+#   cd /opt/syspaq && docker compose -f apps/api/deploy/docker-compose.yml --env-file apps/api/deploy/.env.release up -d --build
 
-name: blumbox-api
+name: syspaq-api
 
 services:
   api:

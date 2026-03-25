@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blumbox Courier API v1 — Documentacion</title>
+<title>SysPaq Courier API v1 — Documentacion</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg-dark:#2D2730;--bg-code:#1E1A21;--bg-white:#FFFFFF;--accent:#01B9BF;--accent-light:#38D8DE;--accent-gold:#ECB75B;--text:#1E293B;--text-light:#64748B;--text-code:#E2E8F0;--border:#E2E8F0;--get:#22C55E;--post:#01B9BF;--patch:#ECB75B;--delete:#EF4444;--sidebar-w:260px;--font-sans:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-mono:"JetBrains Mono","SF Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;--font-display:"Outfit","Plus Jakarta Sans",sans-serif}
@@ -138,7 +138,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
 
 <!-- MOBILE NAV -->
 <div class="mobile-nav">
-  <h1>BLUMBOX API</h1>
+  <h1>SYSPAQ API</h1>
 </div>
 
 <div class="main">
@@ -147,11 +147,11 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
 <div class="section" id="primeros-pasos">
 <div class="section-left">
   <h2>Primeros Pasos</h2>
-  <p>La API de Blumbox es una plataforma courier <strong>multi-tenant</strong> que permite a operadores de logistica gestionar clientes, casilleros, envios, tracking, recepciones y facturacion desde una sola integracion REST.</p>
+  <p>La API de SysPaq es una plataforma courier <strong>multi-tenant</strong> que permite a operadores de logistica gestionar clientes, casilleros, envios, tracking, recepciones y facturacion desde una sola integracion REST.</p>
 
   <div class="base-url">
     <span class="label">Base URL</span>
-    <code>https://api.blumbox.do/v1</code>
+    <code>https://api.syspaq.com/v1</code>
   </div>
 
   <h3>Principios generales</h3>
@@ -176,8 +176,8 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Ejemplo de solicitud</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET https://api.blumbox.do/v1/shipments \
-  -H "X-Api-Key: blx_live_abc123..." \
+    <pre><code>curl -X GET https://api.syspaq.com/v1/shipments \
+  -H "X-Api-Key: spq_live_abc123..." \
   -H "X-Tenant-Id: uuid-del-tenant" \
   -H "Content-Type: application/json"</code></pre>
   </div>
@@ -204,7 +204,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h2>Autenticacion</h2>
 
   <h3>API Key (Operadores / Integraciones)</h3>
-  <p>Las API Keys se crean desde el dashboard del operador. Se envian en el header <code>X-Api-Key</code> junto con el <code>X-Tenant-Id</code>. Las keys de produccion comienzan con <code>blx_live_</code> y las de prueba con <code>blx_test_</code>.</p>
+  <p>Las API Keys se crean desde el dashboard del operador. Se envian en el header <code>X-Api-Key</code> junto con el <code>X-Tenant-Id</code>. Las keys de produccion comienzan con <code>spq_live_</code> y las de prueba con <code>spq_test_</code>.</p>
 
   <div class="alert info">Las API Keys tienen permisos de operador. No las expongas en aplicaciones cliente.</div>
 
@@ -234,18 +234,18 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>API Key directa</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET https://api.blumbox.do/v1/shipments \
-  -H "X-Api-Key: blx_live_abc123..." \
+    <pre><code>curl -X GET https://api.syspaq.com/v1/shipments \
+  -H "X-Api-Key: spq_live_abc123..." \
   -H "X-Tenant-Id: uuid-del-tenant"</code></pre>
   </div>
 
   <h4>Obtener JWT de operador</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/auth/token \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/auth/token \
   -H "Content-Type: application/json" \
   -d '{
-  "apiKey": "blx_live_abc123..."
+  "apiKey": "spq_live_abc123..."
 }'</code></pre>
   </div>
   <div class="code-block">
@@ -260,7 +260,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Login de cliente</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/customers/login \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/customers/login \
   -H "Content-Type: application/json" \
   -d '{
   "email": "juan@email.com",
@@ -367,9 +367,9 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Registrar cliente</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/customers/register \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/customers/register \
   -H "Content-Type: application/json" \
-  -H "X-Api-Key: blx_live_abc123..." \
+  -H "X-Api-Key: spq_live_abc123..." \
   -H "X-Tenant-Id: t1e2n3a4-n5t6-id77-uuid" \
   -d '{
   "email": "juan.perez@email.com",
@@ -401,21 +401,21 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Obtener mi perfil</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET https://api.blumbox.do/v1/customers/me \
+    <pre><code>curl -X GET https://api.syspaq.com/v1/customers/me \
   -H "Authorization: Bearer eyJhbGci..."</code></pre>
   </div>
 
   <h4>Listar clientes (operador)</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET "https://api.blumbox.do/v1/customers?page=1&amp;limit=20&amp;search=juan" \
+    <pre><code>curl -X GET "https://api.syspaq.com/v1/customers?page=1&amp;limit=20&amp;search=juan" \
   -H "Authorization: Bearer eyJhbGci..."</code></pre>
   </div>
 
   <h4>Desactivar cliente</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X DELETE https://api.blumbox.do/v1/customers/a1b2c3d4-... \
+    <pre><code>curl -X DELETE https://api.syspaq.com/v1/customers/a1b2c3d4-... \
   -H "Authorization: Bearer eyJhbGci..."</code></pre>
   </div>
   <div class="code-block">
@@ -481,7 +481,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Crear envio</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/shipments \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/shipments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -515,14 +515,14 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Listar envios</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET "https://api.blumbox.do/v1/shipments?phase=IN_TRANSIT&amp;page=1" \
+    <pre><code>curl -X GET "https://api.syspaq.com/v1/shipments?phase=IN_TRANSIT&amp;page=1" \
   -H "Authorization: Bearer eyJhbGci..."</code></pre>
   </div>
 
   <h4>Buscar por tracking</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET https://api.blumbox.do/v1/trackings/1Z999AA10123456784 \
+    <pre><code>curl -X GET https://api.syspaq.com/v1/trackings/1Z999AA10123456784 \
   -H "Authorization: Bearer eyJhbGci..."</code></pre>
   </div>
 </div>
@@ -578,7 +578,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Agregar evento de tracking</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/shipments/s1h2i3p4-.../events \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/shipments/s1h2i3p4-.../events \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -620,7 +620,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Timeline de eventos</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET https://api.blumbox.do/v1/shipments/s1h2i3p4-.../events \
+    <pre><code>curl -X GET https://api.syspaq.com/v1/shipments/s1h2i3p4-.../events \
   -H "Authorization: Bearer eyJhbGci..."</code></pre>
   </div>
   <div class="code-block">
@@ -703,7 +703,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Crear pre-alerta (cliente)</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/customers/me/pre-alerts \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/customers/me/pre-alerts \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -737,7 +737,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Vincular con envio</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/pre-alerts/p1a2l3r4-.../link \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/pre-alerts/p1a2l3r4-.../link \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -807,7 +807,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Registrar recepcion</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/receptions \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/receptions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -842,7 +842,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Agregar cargo</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/receptions/r1c2p3t4-.../charges \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/receptions/r1c2p3t4-.../charges \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -898,7 +898,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Crear sucursal</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/branches \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/branches \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -941,7 +941,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Listar sucursales publicas</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X GET https://api.blumbox.do/v1/branches/public \
+    <pre><code>curl -X GET https://api.syspaq.com/v1/branches/public \
   -H "X-Tenant-Id: t1e2n3a4-n5t6-id77-uuid"</code></pre>
   </div>
 </div>
@@ -973,7 +973,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Calcular tarifa</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/calculator/estimate \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/calculator/estimate \
   -H "Content-Type: application/json" \
   -H "X-Tenant-Id: t1e2n3a4-n5t6-id77-uuid" \
   -d '{
@@ -1058,7 +1058,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Crear tabla de tarifas</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/rate-tables \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/rate-tables \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -1072,7 +1072,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Agregar tier de peso</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/rate-tables/rt1-.../tiers \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/rate-tables/rt1-.../tiers \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -1149,7 +1149,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Crear plantilla</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/notifications/templates \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/notifications/templates \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -1173,7 +1173,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Preferencias del cliente</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X PATCH https://api.blumbox.do/v1/customers/me/notification-preferences \
+    <pre><code>curl -X PATCH https://api.syspaq.com/v1/customers/me/notification-preferences \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
@@ -1218,7 +1218,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   </div>
 
   <h3>Verificacion de firma</h3>
-  <p>Cada solicitud webhook incluye los headers <code>X-Blumbox-Event</code> y <code>X-Blumbox-Signature</code>. Debes verificar la firma antes de procesar el evento.</p>
+  <p>Cada solicitud webhook incluye los headers <code>X-SysPaq-Event</code> y <code>X-SysPaq-Signature</code>. Debes verificar la firma antes de procesar el evento.</p>
 
   <div class="alert warn">Guarda el <code>secret</code> del webhook de forma segura. No se puede recuperar despues de la creacion.</div>
 
@@ -1238,11 +1238,11 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Crear webhook</h4>
   <div class="code-block">
     <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>curl -X POST https://api.blumbox.do/v1/webhooks \
+    <pre><code>curl -X POST https://api.syspaq.com/v1/webhooks \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGci..." \
   -d '{
-  "url": "https://mi-servidor.com/webhooks/blumbox",
+  "url": "https://mi-servidor.com/webhooks/syspaq",
   "events": [
     "shipment.delivered",
     "shipment.exception",
@@ -1254,7 +1254,7 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
     <div class="code-block-header"><span>json — Respuesta 201</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
     <pre><code>{
   "id": "wh-001-uuid",
-  "url": "https://mi-servidor.com/webhooks/blumbox",
+  "url": "https://mi-servidor.com/webhooks/syspaq",
   "events": [
     "shipment.delivered",
     "shipment.exception",
@@ -1269,8 +1269,8 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
   <h4>Headers del webhook</h4>
   <div class="code-block">
     <div class="code-block-header"><span>headers</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code>X-Blumbox-Event: shipment.delivered
-X-Blumbox-Signature: sha256=5d41402abc4b2a76b9719d911017c592...
+    <pre><code>X-SysPaq-Event: shipment.delivered
+X-SysPaq-Signature: sha256=5d41402abc4b2a76b9719d911017c592...
 Content-Type: application/json</code></pre>
   </div>
 
@@ -1289,9 +1289,9 @@ function verifyWebhook(body, signature, secret) {
 }
 
 // Uso en Express
-app.post('/webhooks/blumbox', (req, res) => {
-  const sig = req.headers['x-blumbox-signature'];
-  const event = req.headers['x-blumbox-event'];
+app.post('/webhooks/syspaq', (req, res) => {
+  const sig = req.headers['x-syspaq-signature'];
+  const event = req.headers['x-syspaq-event'];
 
   if (!verifyWebhook(req.body, sig, WEBHOOK_SECRET)) {
     return res.status(401).send('Firma invalida');
@@ -1429,7 +1429,7 @@ Mar 26, 16:30  DELIVERED
   <div class="code-block">
     <div class="code-block-header"><span>json — 404 Not Found</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
     <pre><code>{
-  "type": "https://api.blumbox.do/problems/404",
+  "type": "https://api.syspaq.com/problems/404",
   "title": "NotFoundException",
   "status": 404,
   "detail": "Envio no encontrado",
@@ -1441,7 +1441,7 @@ Mar 26, 16:30  DELIVERED
   <div class="code-block">
     <div class="code-block-header"><span>json — 400 Bad Request</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
     <pre><code>{
-  "type": "https://api.blumbox.do/problems/400",
+  "type": "https://api.syspaq.com/problems/400",
   "title": "BadRequestException",
   "status": 400,
   "detail": "El campo 'email' es requerido",
@@ -1453,7 +1453,7 @@ Mar 26, 16:30  DELIVERED
   <div class="code-block">
     <div class="code-block-header"><span>json — 409 Conflict</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
     <pre><code>{
-  "type": "https://api.blumbox.do/problems/409",
+  "type": "https://api.syspaq.com/problems/409",
   "title": "ConflictException",
   "status": 409,
   "detail": "Ya existe un cliente con el email juan@email.com",
@@ -1465,7 +1465,7 @@ Mar 26, 16:30  DELIVERED
   <div class="code-block">
     <div class="code-block-header"><span>json — 429 Too Many Requests</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
     <pre><code>{
-  "type": "https://api.blumbox.do/problems/429",
+  "type": "https://api.syspaq.com/problems/429",
   "title": "TooManyRequestsException",
   "status": 429,
   "detail": "Rate limit excedido. Intenta de nuevo en 45 segundos.",
@@ -1477,8 +1477,8 @@ Mar 26, 16:30  DELIVERED
 
 <!-- FOOTER -->
 <div style="padding:40px 48px;text-align:center;border-top:1px solid var(--border);color:var(--text-light);font-size:13px">
-  <p><strong>BLUMBOX</strong> Courier API v1 &mdash; Documentacion generada el 24 de marzo de 2026</p>
-  <p style="margin-top:4px">Para soporte tecnico: <a href="mailto:api@blumbox.do">api@blumbox.do</a></p>
+  <p><strong>SYSPAQ</strong> Courier API v1 &mdash; Documentacion generada el 24 de marzo de 2026</p>
+  <p style="margin-top:4px">Para soporte tecnico: <a href="mailto:api@syspaq.com">api@syspaq.com</a></p>
 </div>
 
 </div><!-- /.main -->

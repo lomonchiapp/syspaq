@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Sun, Moon, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import { useThemeStore } from "@/stores/theme.store";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",

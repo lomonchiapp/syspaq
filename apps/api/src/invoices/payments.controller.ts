@@ -35,7 +35,7 @@ export class PaymentsController {
     const result = await this.payments.record(this.tenantId(req), dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "RECORD",
       resource: "Payment",

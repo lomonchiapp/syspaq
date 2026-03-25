@@ -9,7 +9,7 @@ import {
   Tag,
   ArrowRight,
 } from "lucide-react";
-import { cn, formatDate, formatDateTime } from "@blumbox/ui";
+import { cn, formatDate, formatDateTime } from "@syspaq/ui";
 import {
   useContainerDetail,
   useContainerPackages,

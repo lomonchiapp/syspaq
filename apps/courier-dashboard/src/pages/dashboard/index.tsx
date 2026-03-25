@@ -16,7 +16,7 @@ import { KpiCard } from "@/components/charts/kpi-card";
 import { AreaChart } from "@/components/charts/area-chart";
 import { DonutChart } from "@/components/charts/pie-chart";
 import { KpiSkeleton, ChartSkeleton } from "@/components/shared/loading-skeleton";
-import { formatCurrency } from "@blumbox/ui";
+import { formatCurrency } from "@syspaq/ui";
 import {
   useOverview,
   useShipmentTimeSeries,

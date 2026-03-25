@@ -3,17 +3,17 @@
   "private": true,
   "packageManager": "pnpm@10.12.0",
   "scripts": {
-    "dev:api": "pnpm --filter @blumbox/api dev",
-    "dev:dashboard": "pnpm --filter @blumbox/courier-dashboard dev",
-    "dev:landing": "pnpm --filter @blumbox/syspaq-landing dev",
+    "dev:api": "pnpm --filter @syspaq/api dev",
+    "dev:dashboard": "pnpm --filter @syspaq/dashboard dev",
+    "dev:landing": "pnpm --filter @syspaq/landing dev",
     "build": "pnpm -r build",
-    "lint": "pnpm --filter @blumbox/api lint",
+    "lint": "pnpm --filter @syspaq/api lint",
     "deploy:api": "./scripts/deploy-api.sh",
     "deploy:api:migrate": "./scripts/deploy-api.sh --migrate",
     "deploy:api:logs": "./scripts/deploy-api.sh --logs",
     "deploy:api:status": "./scripts/deploy-api.sh --status",
-    "seed": "pnpm --filter @blumbox/api prisma:seed",
-    "seed:demo": "pnpm --filter @blumbox/api prisma:seed:demo"
+    "seed": "pnpm --filter @syspaq/api prisma:seed",
+    "seed:demo": "pnpm --filter @syspaq/api prisma:seed:demo"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

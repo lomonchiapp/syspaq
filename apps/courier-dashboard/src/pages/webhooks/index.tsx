@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { KpiSkeleton } from "@/components/shared/loading-skeleton";
 import { useToast } from "@/components/ui/toast";
-import { formatDate } from "@blumbox/ui";
+import { formatDate } from "@syspaq/ui";
 import {
   useWebhooks,
   useCreateWebhook,

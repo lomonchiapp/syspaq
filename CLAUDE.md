@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 pnpm monorepo with three apps and one shared package:
 
-- **`apps/api/`** — NestJS 11 REST API backend (`@blumbox/api`)
-- **`apps/courier-dashboard/`** — React logistics dashboard (`@blumbox/courier-dashboard`)
-- **`apps/syspaq-landing/`** — Public marketing landing page (`@blumbox/syspaq-landing`)
-- **`packages/ui/`** — Shared design tokens, CSS theme, and utilities (`@blumbox/ui`)
+- **`apps/api/`** — NestJS 11 REST API backend (`@syspaq/api`)
+- **`apps/courier-dashboard/`** — React logistics dashboard (`@syspaq/dashboard`)
+- **`apps/syspaq-landing/`** — Public marketing landing page (`@syspaq/landing`)
+- **`packages/ui/`** — Shared design tokens, CSS theme, and utilities (`@syspaq/ui`)
 
-The dashboard consumes the API. The landing page is standalone. Both frontends import theme and utilities from `@blumbox/ui`. UI in both frontends is in **Spanish**.
+The dashboard consumes the API. The landing page is standalone. Both frontends import theme and utilities from `@syspaq/ui`. UI in both frontends is in **Spanish**.
 
 ### Domains & Hosting
 | Service | Domain | Hosting |
@@ -41,15 +41,15 @@ Run all commands from the monorepo root unless noted.
 
 | Task | Command |
 |------|---------|
-| Unit tests | `pnpm --filter @blumbox/api test` |
-| Single test | `pnpm --filter @blumbox/api test -- --testPathPattern=<pattern>` |
-| Test + coverage | `pnpm --filter @blumbox/api test:cov` |
-| E2E tests | `pnpm --filter @blumbox/api test:e2e` |
-| Type check | `pnpm --filter @blumbox/api check-types` |
-| Generate Prisma client | `pnpm --filter @blumbox/api prisma:generate` |
-| Run migrations | `pnpm --filter @blumbox/api prisma:migrate` |
-| Push schema (no migration) | `pnpm --filter @blumbox/api prisma:push` |
-| DB explorer | `pnpm --filter @blumbox/api prisma:studio` |
+| Unit tests | `pnpm --filter @syspaq/api test` |
+| Single test | `pnpm --filter @syspaq/api test -- --testPathPattern=<pattern>` |
+| Test + coverage | `pnpm --filter @syspaq/api test:cov` |
+| E2E tests | `pnpm --filter @syspaq/api test:e2e` |
+| Type check | `pnpm --filter @syspaq/api check-types` |
+| Generate Prisma client | `pnpm --filter @syspaq/api prisma:generate` |
+| Run migrations | `pnpm --filter @syspaq/api prisma:migrate` |
+| Push schema (no migration) | `pnpm --filter @syspaq/api prisma:push` |
+| DB explorer | `pnpm --filter @syspaq/api prisma:studio` |
 
 No test or lint scripts are configured in the frontend projects.
 
@@ -64,10 +64,10 @@ Usage in apps:
 ```css
 /* app globals.css */
 @import "tailwindcss";
-@import "@blumbox/ui/styles";
+@import "@syspaq/ui/styles";
 ```
 ```ts
-import { cn, formatCurrency } from "@blumbox/ui";
+import { cn, formatCurrency } from "@syspaq/ui";
 ```
 
 Design tokens: primary teal (#01b9bf), accent gold (#ecb75b), surface grays. Fonts: Plus Jakarta Sans (body), Outfit (display), JetBrains Mono (code).
@@ -149,7 +149,7 @@ The seed script (`prisma/seed.ts`) creates a "demo" tenant with realistic data. 
 
 **Demo credentials (fixed, deterministic):**
 - Tenant ID: `demo`
-- API Key: `blx_demo_syspaq-sandbox-2025-public-key`
+- API Key: `spq_demo_syspaq-sandbox-2025`
 
 **Data created:** 8 customers, 21 shipments (across all phases), 4 branches (Miami warehouse, SDQ office, STI pickup, AILA sorting center), 2 containers (sea + air), DGA labels, invoices with payments, delivery orders, pre-alerts, post-alerts, rate table, notification templates.
 
@@ -171,13 +171,13 @@ pnpm deploy:api:status       # show container status
 
 ### Prerequisites
 - SSH key configured for the VPS (or password in `.vps-connection.env`)
-- Monorepo cloned on VPS at `/opt/blumbox`
+- Monorepo cloned on VPS at `/opt/syspaq`
 - `apps/api/deploy/.env.release` on VPS with production secrets
 - `apps/api/deploy/.vps-connection.env` locally with `VPS_HOST` and `VPS_USER`
 
 ### Docker (local build)
 ```bash
-docker build -f apps/api/deploy/Dockerfile -t blumbox-api .
+docker build -f apps/api/deploy/Dockerfile -t syspaq-api .
 docker compose -f apps/api/deploy/docker-compose.yml --env-file apps/api/deploy/.env.release up -d --build
 ```
 

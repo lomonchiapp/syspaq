@@ -39,7 +39,7 @@ export class EcommerceController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "CREATE",
       resource: "EcommerceConnection",
@@ -69,7 +69,7 @@ export class EcommerceController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "UPDATE",
       resource: "EcommerceConnection",
@@ -87,7 +87,7 @@ export class EcommerceController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId ?? "system",
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown") ?? "system",
       actorType: ActorType.API_KEY,
       action: "DELETE",
       resource: "EcommerceConnection",

@@ -1,4 +1,4 @@
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 const STATUS_COLORS: Record<string, string> = {
   // Shipment phases

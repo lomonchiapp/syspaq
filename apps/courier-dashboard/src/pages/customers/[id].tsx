@@ -17,7 +17,7 @@ import {
   Pencil,
   DollarSign,
 } from "lucide-react";
-import { cn, formatCurrency, formatDate } from "@blumbox/ui";
+import { cn, formatCurrency, formatDate } from "@syspaq/ui";
 import {
   useCustomerDetailExtended,
   useCustomerShipments,

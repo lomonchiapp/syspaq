@@ -120,7 +120,7 @@ export class WebhooksController {
       event: "webhook.test",
       tenantId,
       timestamp: new Date().toISOString(),
-      message: "This is a test payload from Blumbox",
+      message: "This is a test payload from SysPaq",
     };
 
     const result = await this.webhookChannel.send(

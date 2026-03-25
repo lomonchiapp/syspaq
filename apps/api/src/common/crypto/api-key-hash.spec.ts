@@ -2,8 +2,8 @@ import { hashApiKey, safeEqualHex } from "./api-key-hash";
 
 describe("hashApiKey", () => {
   it("produces deterministic hash with pepper", () => {
-    const a = hashApiKey("blx_live_test", "pepper-one");
-    const b = hashApiKey("blx_live_test", "pepper-one");
+    const a = hashApiKey("spq_live_test", "pepper-one");
+    const b = hashApiKey("spq_live_test", "pepper-one");
     expect(a).toBe(b);
     expect(a).toHaveLength(64);
   });

@@ -2,6 +2,7 @@ import { BadRequestException, Body, Controller, Headers, Post } from "@nestjs/co
 import { ApiHeader, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { ExchangeTokenDto } from "./dto/exchange-token.dto";
+import { LoginUserDto } from "@/users/dto/login-user.dto";
 import { Public } from "@/common/decorators/public.decorator";
 
 @ApiTags("auth")
@@ -31,5 +32,28 @@ export class AuthController {
       token_type: "Bearer" as const,
       expires_in: 86400,
     };
+  }
+
+  @Public()
+  @Post("login")
+  @ApiOperation({
+    summary: "Dashboard user login (email + password)",
+    description:
+      "Authenticate a dashboard user with email and password. Send tenant ID or slug in X-Tenant-Id header.",
+  })
+  @ApiHeader({ name: "X-Tenant-Id", required: true })
+  async loginUser(
+    @Headers("x-tenant-id") tenantId: string | undefined,
+    @Body() dto: LoginUserDto,
+  ): Promise<{
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+    user: { id: string; email: string; firstName: string; lastName: string; role: string };
+  }> {
+    if (!tenantId || typeof tenantId !== "string") {
+      throw new BadRequestException("Missing X-Tenant-Id header");
+    }
+    return this.auth.loginUser(tenantId, dto.email, dto.password);
   }
 }

@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 import type { ReactNode } from "react";
 
 export interface TimelineEvent {

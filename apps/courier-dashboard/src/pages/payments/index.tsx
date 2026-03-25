@@ -6,7 +6,7 @@ import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn, formatCurrency, formatDate } from "@blumbox/ui";
+import { cn, formatCurrency, formatDate } from "@syspaq/ui";
 import { usePayments } from "@/hooks/use-api";
 import { RecordPaymentDialog } from "@/pages/invoices/record-payment-dialog";
 import type { PaymentListItem } from "@/types/api";

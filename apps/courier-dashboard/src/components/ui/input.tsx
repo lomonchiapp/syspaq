@@ -1,5 +1,5 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;

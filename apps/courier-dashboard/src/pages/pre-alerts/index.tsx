@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatCurrency, formatDate } from "@blumbox/ui";
+import { formatCurrency, formatDate } from "@syspaq/ui";
 import { usePreAlerts } from "@/hooks/use-api";
 import type { PreAlert } from "@/types/api";
 

@@ -24,12 +24,12 @@ function hoursAgo(n: number): Date {
 
 async function seedDev(pepper: string) {
   const tenant = await prisma.tenant.upsert({
-    where: { slug: "blumbox" },
-    create: { slug: "blumbox", name: "Blumbox" },
+    where: { slug: "syspaq-dev" },
+    create: { slug: "syspaq-dev", name: "SysPaq Dev" },
     update: {},
   });
 
-  const rawKey = `blx_live_${randomBytes(24).toString("base64url")}`;
+  const rawKey = `spq_live_${randomBytes(24).toString("base64url")}`;
   const keyHash = hashApiKey(rawKey, pepper);
   const keyPrefix = rawKey.slice(0, 16);
 
@@ -55,11 +55,11 @@ async function seedDemo(pepper: string) {
   });
 
   // ── API Key (fixed, deterministic for demo) ──
-  const demoRawKey = "blx_demo_syspaq-sandbox-2025-public-key";
+  const demoRawKey = "spq_demo_syspaq-sandbox-2025";
   const demoHash = hashApiKey(demoRawKey, pepper);
   await prisma.apiKey.deleteMany({ where: { tenantId: tenant.id, name: "Demo key" } });
   await prisma.apiKey.create({
-    data: { tenantId: tenant.id, name: "Demo key", keyHash: demoHash, keyPrefix: "blx_demo_syspaq-", role: "ADMIN" },
+    data: { tenantId: tenant.id, name: "Demo key", keyHash: demoHash, keyPrefix: "spq_demo_syspaq", role: "ADMIN" },
   });
 
   // ── Branches ──
@@ -159,6 +159,30 @@ async function seedDemo(pepper: string) {
     customers.push(customer);
   }
   await prisma.tenant.update({ where: { id: tenant.id }, data: { casilleroCounter: customers.length } });
+
+  // ── Demo Users ──
+  const userPasswordHash = await bcryptHash("demo1234", 12);
+  await prisma.user.deleteMany({ where: { tenantId: tenant.id } });
+  await prisma.user.create({
+    data: {
+      tenantId: tenant.id,
+      email: "admin@syspaq-demo.com",
+      passwordHash: userPasswordHash,
+      firstName: "Admin",
+      lastName: "Demo",
+      role: "ADMIN",
+    },
+  });
+  await prisma.user.create({
+    data: {
+      tenantId: tenant.id,
+      email: "operador@syspaq-demo.com",
+      passwordHash: userPasswordHash,
+      firstName: "Operador",
+      lastName: "Demo",
+      role: "OPERATOR",
+    },
+  });
 
   // ── Rate Table ──
   await prisma.rateTable.create({
@@ -519,12 +543,13 @@ async function seedDemo(pepper: string) {
   console.log("API Key    :", demoRawKey);
   console.log("");
   console.log("Dashboard login:");
-  console.log("  Tenant ID: demo");
-  console.log("  API Key  : blx_demo_syspaq-sandbox-2025-public-key");
+  console.log("  Tenant: demo");
+  console.log("  Admin: admin@syspaq-demo.com / demo1234");
+  console.log("  Operador: operador@syspaq-demo.com / demo1234");
   console.log("");
   console.log(`Data created: ${customers.length} customers, ${shipments.length} shipments, ${branches.length} branches`);
   console.log(`             ${invoiceNum} invoices, ${doNum} delivery orders, ${preAlertsData.length} pre-alerts`);
-  console.log(`             2 containers, ${dgaShipments.length} DGA labels, 1 rate table`);
+  console.log(`             2 containers, ${dgaShipments.length} DGA labels, 1 rate table, 2 users`);
 }
 
 // ─── Main ────────────────────────────────────────────────────────

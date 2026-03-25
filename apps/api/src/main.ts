@@ -43,7 +43,7 @@ async function bootstrap() {
   );
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("Blumbox Courier API")
+    .setTitle("SysPaq Courier API")
     .setDescription(
       "API REST multi-tenant para tracking de envíos, clientes, casilleros, pre-alertas y más. " +
       "Autenticación: `X-Api-Key` + `X-Tenant-Id`, Bearer JWT desde `POST /v1/auth/token`, " +
@@ -63,7 +63,7 @@ async function bootstrap() {
 
   const port = config.get<number>("port") ?? 3001;
   await app.listen(port);
-  console.warn(`Blumbox API listening on http://localhost:${port}`);
+  console.warn(`SysPaq API listening on http://localhost:${port}`);
   console.warn(`Documentación: http://localhost:${port}/docs`);
   console.warn(`Swagger UI: http://localhost:${port}/swagger`);
 }

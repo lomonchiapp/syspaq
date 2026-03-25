@@ -1,5 +1,5 @@
 {
-  "name": "@blumbox/courier-dashboard",
+  "name": "@syspaq/dashboard",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -19,7 +19,7 @@
     "vite": "^8.0.1"
   },
   "dependencies": {
-    "@blumbox/ui": "workspace:*",
+    "@syspaq/ui": "workspace:*",
     "@tanstack/react-query": "^5.95.2",
     "lucide-react": "^1.6.0",
     "motion": "^12.38.0",

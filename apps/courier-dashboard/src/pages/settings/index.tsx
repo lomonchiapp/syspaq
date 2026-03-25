@@ -11,7 +11,7 @@ import { DetailCard } from "@/components/shared/detail-card";
 import { InfoGrid } from "@/components/shared/info-grid";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Skeleton } from "@/components/shared/loading-skeleton";
-import { formatDateTime } from "@blumbox/ui";
+import { formatDateTime } from "@syspaq/ui";
 import { useTenantSettings, useApiKeys } from "@/hooks/use-api";
 
 export default function SettingsPage() {

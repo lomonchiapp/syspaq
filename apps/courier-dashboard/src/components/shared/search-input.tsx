@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 
 interface SearchInputProps {
   value: string;

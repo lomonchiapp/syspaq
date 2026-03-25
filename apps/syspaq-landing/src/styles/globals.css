@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@blumbox/ui/styles";
+@import "@syspaq/ui/styles";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

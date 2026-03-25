@@ -11,7 +11,7 @@ import {
   Receipt,
   DollarSign,
 } from "lucide-react";
-import { cn, formatCurrency, formatDate, formatDateTime } from "@blumbox/ui";
+import { cn, formatCurrency, formatDate, formatDateTime } from "@syspaq/ui";
 import {
   useInvoiceDetail,
   useInvoicePayments,

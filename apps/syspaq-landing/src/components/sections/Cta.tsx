@@ -5,8 +5,9 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 
 const DEMO_CREDENTIALS = {
-  tenantId: "demo",
-  apiKey: "blx_demo_syspaq-sandbox-2025-public-key",
+  tenant: "demo",
+  email: "admin@syspaq-demo.com",
+  password: "demo1234",
 };
 
 function CopyButton({ text }: { text: string }) {
@@ -86,17 +87,24 @@ export function Cta() {
               <div className="mt-6 space-y-3">
                 <div className="rounded-lg bg-surface-900/80 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-surface-500">Tenant ID</span>
-                    <CopyButton text={DEMO_CREDENTIALS.tenantId} />
+                    <span className="text-xs text-surface-500">Empresa</span>
+                    <CopyButton text={DEMO_CREDENTIALS.tenant} />
                   </div>
-                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.tenantId}</code>
+                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.tenant}</code>
                 </div>
                 <div className="rounded-lg bg-surface-900/80 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-surface-500">API Key</span>
-                    <CopyButton text={DEMO_CREDENTIALS.apiKey} />
+                    <span className="text-xs text-surface-500">Correo</span>
+                    <CopyButton text={DEMO_CREDENTIALS.email} />
                   </div>
-                  <code className="mt-1 block text-sm text-primary-300 font-mono break-all">{DEMO_CREDENTIALS.apiKey}</code>
+                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.email}</code>
+                </div>
+                <div className="rounded-lg bg-surface-900/80 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-surface-500">Contraseña</span>
+                    <CopyButton text={DEMO_CREDENTIALS.password} />
+                  </div>
+                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.password}</code>
                 </div>
               </div>
 

@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatCurrency, formatDate } from "@blumbox/ui";
+import { formatCurrency, formatDate } from "@syspaq/ui";
 import { useCreditNotes } from "@/hooks/use-api";
 import { Button } from "@/components/ui/button";
 import type { CreditNoteItem } from "@/types/api";

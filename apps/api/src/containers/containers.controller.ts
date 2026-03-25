@@ -40,7 +40,7 @@ export class ContainersController {
     const container = await this.containers.create(this.tenantId(req), dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "container.create",
       resource: "container",
@@ -76,7 +76,7 @@ export class ContainersController {
     const container = await this.containers.update(this.tenantId(req), id, dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "container.update",
       resource: "container",
@@ -95,7 +95,7 @@ export class ContainersController {
     const item = await this.containers.addItem(this.tenantId(req), id, dto);
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "container.addItem",
       resource: "container",
@@ -119,7 +119,7 @@ export class ContainersController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "container.removeItem",
       resource: "container",
@@ -143,7 +143,7 @@ export class ContainersController {
     );
     this.audit.log({
       tenantId: this.tenantId(req),
-      actor: req.auth!.apiKeyId,
+      actor: (req.auth!.apiKeyId || req.auth!.userId || "unknown"),
       actorType: ActorType.API_KEY,
       action: "container.transition",
       resource: "container",

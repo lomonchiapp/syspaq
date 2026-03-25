@@ -8,7 +8,7 @@ import {
 } from "class-validator";
 
 export class CreateWebhookDto {
-  @ApiProperty({ example: "https://example.com/webhooks/blumbox" })
+  @ApiProperty({ example: "https://example.com/webhooks/syspaq" })
   @IsString()
   @IsUrl({}, { message: "url must be a valid URL" })
   url!: string;

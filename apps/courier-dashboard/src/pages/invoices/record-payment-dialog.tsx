@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { useCreatePayment } from "@/hooks/use-api";
-import { formatCurrency } from "@blumbox/ui";
+import { formatCurrency } from "@syspaq/ui";
 
 interface RecordPaymentDialogProps {
   open: boolean;

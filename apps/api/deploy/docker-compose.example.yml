@@ -6,7 +6,7 @@
 #
 # La API queda en 127.0.0.1:3001 del host; Nginx/Caddy en el host debe hacer proxy a ese puerto.
 
-name: blumbox-api
+name: syspaq-api
 
 services:
   api:

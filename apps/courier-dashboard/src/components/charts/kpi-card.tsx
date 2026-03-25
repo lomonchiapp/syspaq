@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { cn } from "@blumbox/ui";
+import { cn } from "@syspaq/ui";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface KpiCardProps {
