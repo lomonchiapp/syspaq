@@ -26,33 +26,33 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - blumbox_net
+      - syspaq_net
       - redroid_default   # Para que nginx de redroid haga proxy a api.syspaq.com
     restart: unless-stopped
 
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: blumbox
+      POSTGRES_USER: syspaq
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: blumbox_api
+      POSTGRES_DB: syspaq_api
     volumes:
-      - blumbox_pgdata:/var/lib/postgresql/data
+      - syspaq_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U blumbox -d blumbox_api"]
+      test: ["CMD-SHELL", "pg_isready -U syspaq -d syspaq_api"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - blumbox_net
+      - syspaq_net
     restart: unless-stopped
 
 networks:
-  blumbox_net:
-    name: blumbox_api_isolated
+  syspaq_net:
+    name: syspaq_api_net
   redroid_default:
     external: true
 
 volumes:
-  blumbox_pgdata:
-    name: blumbox_api_pgdata
+  syspaq_pgdata:
+    name: syspaq_api_pgdata
