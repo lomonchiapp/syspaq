@@ -91,9 +91,13 @@ const NAV_SECTIONS: NavSection[] = [
   },
 ];
 
-function SysPaqLogo() {
+function SysPaqLogo({ mode }: { mode: "dark" | "light" }) {
   return (
-    <img src="/logo-white.png" alt="SysPaq" className="h-7 w-auto" />
+    <img
+      src={mode === "dark" ? "/logo-white.png" : "/logo.png"}
+      alt="SysPaq"
+      className="h-7 w-auto"
+    />
   );
 }
 
@@ -106,7 +110,7 @@ export function Sidebar() {
     <>
       {/* Logo */}
       <div className="flex items-center px-4 py-5 border-b border-[var(--sidebar-border)]">
-        <SysPaqLogo />
+        <SysPaqLogo mode={mode} />
       </div>
 
       {/* Navigation */}
