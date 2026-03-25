@@ -13,6 +13,13 @@ pnpm monorepo with three apps and one shared package:
 
 The dashboard consumes the API. The landing page is standalone. Both frontends import theme and utilities from `@blumbox/ui`. UI in both frontends is in **Spanish**.
 
+### Domains & Hosting
+| Service | Domain | Hosting |
+|---------|--------|---------|
+| Landing | `syspaq.com` | Vercel |
+| Dashboard | `app.syspaq.com` | Vercel |
+| API | `api.syspaq.com` | VPS (Docker) |
+
 ## Commands
 
 Run all commands from the monorepo root unless noted.
