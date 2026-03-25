@@ -191,7 +191,8 @@ export function useShipmentDetail(id: string) {
 export function useShipmentEvents(id: string) {
   return useQuery({
     queryKey: ["shipments", id, "events"],
-    queryFn: () => api.get<TrackingEvent[]>(`/v1/shipments/${id}/events`),
+    queryFn: () =>
+      api.get<{ data: TrackingEvent[]; meta: unknown }>(`/v1/shipments/${id}/events`).then((r) => r.data),
     enabled: !!id,
   });
 }
