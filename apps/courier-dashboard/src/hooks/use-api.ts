@@ -103,10 +103,18 @@ export function useTopCustomers(dateFrom: string, dateTo: string) {
 export function useDeliveryPerformance(dateFrom: string, dateTo: string) {
   return useQuery({
     queryKey: ["analytics", "delivery-performance", dateFrom, dateTo],
-    queryFn: () =>
-      api.get<DeliveryPerformanceResponse>(
+    queryFn: async (): Promise<DeliveryPerformanceResponse> => {
+      const raw = await api.get<{ data: { total: number; delivered: number; failed: number; successRate: number; avgDeliveryTimeHours: number } }>(
         `/v1/analytics/delivery-performance?dateFrom=${dateFrom}&dateTo=${dateTo}`,
-      ),
+      );
+      const d = raw.data;
+      return {
+        onTimeRate: d.successRate ?? 0,
+        averageDeliveryDays: d.avgDeliveryTimeHours != null ? d.avgDeliveryTimeHours / 24 : 0,
+        totalDelivered: d.delivered ?? 0,
+        totalFailed: d.failed ?? 0,
+      };
+    },
   });
 }
 
@@ -115,7 +123,7 @@ export function usePaymentMethods(dateFrom: string, dateTo: string) {
     queryKey: ["analytics", "payment-methods", dateFrom, dateTo],
     queryFn: () =>
       api.get<PaymentMethodsResponse>(
-        `/v1/analytics/payments/by-method?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        `/v1/analytics/payment-methods?dateFrom=${dateFrom}&dateTo=${dateTo}`,
       ),
   });
 }
@@ -588,7 +596,7 @@ export function useGenerateDgaLabels() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { containerId: string }) =>
-      api.post("/v1/dga/labels/generate", data),
+      api.post("/v1/dga/labels/generate-for-container", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["dga-labels"] });
       qc.invalidateQueries({ queryKey: ["dga-stats"] });
@@ -600,7 +608,7 @@ export function useBulkUpdateDgaStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { labelIds: string[]; status: string }) =>
-      api.post("/v1/dga/labels/bulk-update", data),
+      api.post("/v1/dga/labels/bulk-status", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["dga-labels"] });
       qc.invalidateQueries({ queryKey: ["dga-stats"] });
@@ -779,14 +787,14 @@ export function useBulkImports(page = 1, limit = 20) {
   const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   return useQuery({
     queryKey: ["bulk-imports", page, limit],
-    queryFn: () => api.get<PaginatedResponse<BulkImportItem>>(`/v1/bulk-imports?${params}`),
+    queryFn: () => api.get<PaginatedResponse<BulkImportItem>>(`/v1/bulk-import?${params}`),
   });
 }
 
 export function useBulkImportDetail(id: string) {
   return useQuery({
     queryKey: ["bulk-imports", id],
-    queryFn: () => api.get<BulkImportDetail>(`/v1/bulk-imports/${id}`),
+    queryFn: () => api.get<BulkImportDetail>(`/v1/bulk-import/${id}`),
     enabled: !!id,
   });
 }
@@ -795,7 +803,7 @@ export function useStartImport() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { type: string; items: any[] }) =>
-      api.post<BulkImportItem>("/v1/bulk-imports", data),
+      api.post<BulkImportItem>(`/v1/bulk-import/${data.type.toLowerCase()}`, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["bulk-imports"] }),
   });
 }
