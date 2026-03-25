@@ -13,3 +13,4 @@ coverage/
 # Deploy secrets (never commit)
 apps/api/deploy/.env.release
 apps/api/deploy/.vps-connection.env
+.vercel
