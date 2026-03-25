@@ -60,7 +60,7 @@ export function Navbar() {
           >
             Iniciar Sesión
           </a>
-          <Button variant="accent" href="#contacto" className="text-xs px-4 py-2">
+          <Button variant="accent" href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`} className="text-xs px-4 py-2">
             Prueba Gratis
           </Button>
         </div>
@@ -95,10 +95,10 @@ export function Navbar() {
                 </a>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-surface-700/50">
-                <a href="#" className="text-sm text-surface-300">
+                <a href={import.meta.env.VITE_DASHBOARD_URL || "/dashboard"} className="text-sm text-surface-300">
                   Iniciar Sesión
                 </a>
-                <Button variant="accent" href="#contacto" className="text-xs">
+                <Button variant="accent" href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`} className="text-xs">
                   Prueba Gratis
                 </Button>
               </div>

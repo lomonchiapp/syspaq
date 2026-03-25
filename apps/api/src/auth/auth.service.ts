@@ -1,10 +1,12 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ApiKey, ApiRole } from "@prisma/client";
+import { randomBytes } from "crypto";
 import { PrismaService } from "@/prisma/prisma.service";
 import { UsersService } from "@/users/users.service";
 import { hashApiKey, safeEqualHex } from "@/common/crypto/api-key-hash";
+import { SignupDto } from "./dto/signup.dto";
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,62 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly users: UsersService,
   ) {}
+
+  async signup(dto: SignupDto) {
+    const pepper = this.config.get<string>("apiKeyPepper") ?? "";
+
+    // Check slug uniqueness
+    const existing = await this.prisma.tenant.findUnique({ where: { slug: dto.slug } });
+    if (existing) throw new ConflictException("El slug ya está en uso");
+
+    const rawKey = `spq_live_${randomBytes(24).toString("base64url")}`;
+    const keyHash = hashApiKey(rawKey, pepper);
+    const keyPrefix = rawKey.slice(0, 16);
+
+    const tenant = await this.prisma.$transaction(async (tx) => {
+      const t = await tx.tenant.create({
+        data: {
+          slug: dto.slug,
+          name: dto.companyName,
+          casilleroPrefix: dto.slug.slice(0, 3).toUpperCase(),
+        },
+      });
+
+      await tx.apiKey.create({
+        data: {
+          tenantId: t.id,
+          name: "Default API Key",
+          keyHash,
+          keyPrefix,
+          role: ApiRole.ADMIN,
+        },
+      });
+
+      await this.users.create(t.id, {
+        email: dto.email,
+        password: dto.password,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        role: ApiRole.ADMIN,
+      });
+
+      return t;
+    });
+
+    const accessToken = this.issueAccessToken(tenant.id, tenant.id, ApiRole.ADMIN, "user");
+
+    return {
+      access_token: accessToken,
+      token_type: "Bearer" as const,
+      expires_in: 86400,
+      tenant: {
+        id: tenant.id,
+        slug: tenant.slug,
+        name: tenant.name,
+      },
+      api_key: rawKey,
+    };
+  }
 
   async validateApiKey(rawKey: string, tenantId: string): Promise<ApiKey> {
     const pepper = this.config.get<string>("apiKeyPepper") ?? "";

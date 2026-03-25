@@ -881,3 +881,20 @@ export function useApiKeys() {
     queryFn: () => api.get<ApiKeyItem[]>("/v1/settings/api-keys"),
   });
 }
+
+export function useCreateApiKey() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string; role?: string }) =>
+      api.post<ApiKeyItem>("/v1/settings/api-keys", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["settings", "api-keys"] }),
+  });
+}
+
+export function useRevokeApiKey() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ success: boolean }>(`/v1/settings/api-keys/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["settings", "api-keys"] }),
+  });
+}

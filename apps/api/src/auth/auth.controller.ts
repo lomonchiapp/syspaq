@@ -2,6 +2,7 @@ import { BadRequestException, Body, Controller, Headers, Post } from "@nestjs/co
 import { ApiHeader, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { ExchangeTokenDto } from "./dto/exchange-token.dto";
+import { SignupDto } from "./dto/signup.dto";
 import { LoginUserDto } from "@/users/dto/login-user.dto";
 import { Public } from "@/common/decorators/public.decorator";
 
@@ -9,6 +10,17 @@ import { Public } from "@/common/decorators/public.decorator";
 @Controller("auth")
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
+
+  @Public()
+  @Post("signup")
+  @ApiOperation({
+    summary: "Crear cuenta (tenant + admin + API key)",
+    description:
+      "Registra un nuevo tenant, crea el usuario admin y genera la primera API key. La clave se devuelve una sola vez — guárdala de inmediato.",
+  })
+  async signup(@Body() dto: SignupDto) {
+    return this.auth.signup(dto);
+  }
 
   @Public()
   @Post("token")

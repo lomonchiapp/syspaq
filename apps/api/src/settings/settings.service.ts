@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { ApiRole } from "@prisma/client";
+import { randomBytes } from "crypto";
 import { PrismaService } from "@/prisma/prisma.service";
+import { hashApiKey } from "@/common/crypto/api-key-hash";
 
 @Injectable()
 export class SettingsService {
@@ -66,5 +69,32 @@ export class SettingsService {
       lastUsedAt: k.lastUsedAt?.toISOString() ?? null,
       createdAt: k.createdAt.toISOString(),
     }));
+  }
+
+  async createApiKey(tenantId: string, name: string, role: ApiRole = ApiRole.INTEGRATION) {
+    const pepper = this.config.get<string>("apiKeyPepper") ?? "";
+    const rawKey = `spq_live_${randomBytes(24).toString("base64url")}`;
+    const keyHash = hashApiKey(rawKey, pepper);
+    const keyPrefix = rawKey.slice(0, 16);
+
+    const key = await this.prisma.apiKey.create({
+      data: { tenantId, name, keyHash, keyPrefix, role },
+    });
+
+    return {
+      id: key.id,
+      prefix: key.keyPrefix,
+      name: key.name,
+      role: key.role,
+      createdAt: key.createdAt.toISOString(),
+      // Returned only once — never stored in plaintext
+      rawKey,
+    };
+  }
+
+  async revokeApiKey(tenantId: string, keyId: string) {
+    const key = await this.prisma.apiKey.findFirst({ where: { id: keyId, tenantId } });
+    if (!key) throw new NotFoundException("API key not found");
+    await this.prisma.apiKey.delete({ where: { id: keyId } });
   }
 }

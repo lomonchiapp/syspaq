@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { ToastProvider } from "@/components/ui/toast";
 
 const LoginPage = lazy(() => import("@/pages/login"));
+const RegisterPage = lazy(() => import("@/pages/register"));
 const DashboardPage = lazy(() => import("@/pages/dashboard"));
 const CustomersPage = lazy(() => import("@/pages/customers"));
 const CustomerDetailPage = lazy(() => import("@/pages/customers/[id]"));
@@ -46,6 +47,7 @@ export default function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />

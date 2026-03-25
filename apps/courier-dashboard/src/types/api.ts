@@ -543,12 +543,13 @@ export interface TenantSettings {
 }
 
 export interface ApiKeyItem {
-  id!: string;
-  prefix!: string;
-  name!: string;
-  role!: string;
+  id: string;
+  prefix: string;
+  name: string;
+  role: string;
   lastUsedAt?: string;
-  createdAt!: string;
+  createdAt: string;
+  rawKey?: string; // only present immediately after creation
 }
 
 /* ------------------------------------------------------------------ */

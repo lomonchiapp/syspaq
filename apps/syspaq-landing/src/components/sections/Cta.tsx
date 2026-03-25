@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, MonitorPlay, Copy, Check } from "lucide-react";
+import { MonitorPlay, Copy, Check, Rocket, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -31,13 +31,6 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function Cta() {
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setSubmitted(true);
-  }
-
   return (
     <section id="contacto" className="relative py-24">
       {/* Background */}
@@ -114,68 +107,59 @@ export function Cta() {
               </Button>
             </motion.div>
 
-            {/* Contact form */}
+            {/* Signup CTA card */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex flex-col rounded-xl border border-accent-400/30 bg-accent-400/5 p-6 sm:p-8"
             >
-              {submitted ? (
-                <div className="flex h-full items-center justify-center rounded-xl border border-primary-500/30 bg-primary-500/10 p-8 text-center">
-                  <div>
-                    <p className="font-display text-xl font-semibold text-primary-400">
-                      Recibido
-                    </p>
-                    <p className="mt-2 text-sm text-surface-400">
-                      Nos pondremos en contacto contigo pronto.
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-400/20">
+                  <Rocket className="h-5 w-5 text-accent-400" />
                 </div>
-              ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-4 rounded-xl border border-surface-700/50 bg-surface-900/50 p-6 sm:p-8"
+                <div>
+                  <h3 className="font-display text-lg font-semibold">Crear mi cuenta</h3>
+                  <p className="text-xs text-surface-400">14 días gratis — sin tarjeta</p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm text-surface-300">
+                Crea tu tenant en segundos. Recibes acceso al dashboard completo y tu primera API key para empezar a integrar.
+              </p>
+
+              <ul className="mt-6 space-y-2.5">
+                {[
+                  "Tenant + usuario admin + API key",
+                  "Hasta 100 envíos de prueba",
+                  "Documentación API incluida",
+                  "Sin contrato, cancela cuando quieras",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-surface-300">
+                    <Check className="h-4 w-4 shrink-0 text-accent-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-8 flex flex-col gap-3">
+                <Button
+                  variant="accent"
+                  href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`}
+                  className="w-full"
                 >
-                  <h3 className="font-display text-lg font-semibold">Solicitar Demo Personalizada</h3>
-                  <p className="text-sm text-surface-400">Te contactamos para una demo con tu equipo.</p>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <input
-                      type="text"
-                      placeholder="Nombre"
-                      required
-                      className="rounded-lg border border-surface-700 bg-surface-800 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      required
-                      className="rounded-lg border border-surface-700 bg-surface-800 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                    />
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <input
-                      type="text"
-                      placeholder="Empresa"
-                      className="rounded-lg border border-surface-700 bg-surface-800 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Teléfono"
-                      className="rounded-lg border border-surface-700 bg-surface-800 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                    />
-                  </div>
-                  <textarea
-                    placeholder="Cuéntanos sobre tu operación..."
-                    rows={3}
-                    className="w-full rounded-lg border border-surface-700 bg-surface-800 px-4 py-3 text-sm text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 resize-none"
-                  />
-                  <Button variant="accent" className="w-full">
-                    <Send className="h-4 w-4" />
-                    Solicitar Demo
-                  </Button>
-                </form>
-              )}
+                  <Rocket className="h-4 w-4" />
+                  Empezar gratis
+                </Button>
+                <a
+                  href="#contacto-demo"
+                  className="flex items-center justify-center gap-1.5 text-sm text-surface-400 hover:text-surface-200 transition-colors"
+                >
+                  ¿Necesitas una demo personalizada?
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
             </motion.div>
           </div>
         </div>
