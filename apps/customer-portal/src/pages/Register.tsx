@@ -4,7 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api";
 import { setSession } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
-import { useSlug } from "@/hooks/useSlug";
+import { useSlug, usePortalPath } from "@/hooks/useSlug";
 
 const ID_TYPE_OPTIONS = [
   { value: "", label: "Seleccionar..." },
@@ -16,6 +16,7 @@ const ID_TYPE_OPTIONS = [
 
 export default function Register() {
   const slug = useSlug();
+  const p = usePortalPath();
   const navigate = useNavigate();
   const { branding, loading: brandingLoading } = useBranding(slug);
 
@@ -78,7 +79,7 @@ export default function Register() {
       }>(`/portal/${slug}/auth/register`, payload);
 
       setSession(res.access_token, res.customer);
-      navigate("/dashboard");
+      navigate(p("/dashboard"));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al crear la cuenta");
     } finally {
@@ -237,7 +238,7 @@ export default function Register() {
 
           <p className="text-center text-sm text-gray-400 mt-5">
             Ya tienes cuenta?{" "}
-            <Link to="/login" className="font-medium hover:underline" style={{ color: primary }}>
+            <Link to={p("/login")} className="font-medium hover:underline" style={{ color: primary }}>
               Iniciar Sesion
             </Link>
           </p>

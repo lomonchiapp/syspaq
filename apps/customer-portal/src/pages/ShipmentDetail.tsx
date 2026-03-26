@@ -4,7 +4,7 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import { api } from "@/lib/api";
 import { isAuthenticated } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
-import { useSlug } from "@/hooks/useSlug";
+import { useSlug, usePortalPath } from "@/hooks/useSlug";
 import { formatDate } from "@syspaq/ui";
 
 const PHASE_LABELS: Record<string, string> = {
@@ -37,6 +37,7 @@ interface ShipmentDetailData {
 export default function ShipmentDetail() {
   const { id } = useParams<{ id: string }>();
   const slug = useSlug();
+  const p = usePortalPath();
   const navigate = useNavigate();
   const { branding } = useBranding(slug);
   const [shipment, setShipment] = useState<ShipmentDetailData | null>(null);
@@ -46,12 +47,12 @@ export default function ShipmentDetail() {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate("/login", { replace: true });
+      navigate(p("/login"), { replace: true });
       return;
     }
     api.get<ShipmentDetailData>(`/portal/me/shipments/${id}`)
       .then(setShipment)
-      .catch(() => navigate("/dashboard"))
+      .catch(() => navigate(p("/dashboard")))
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
@@ -59,7 +60,7 @@ export default function ShipmentDetail() {
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-white/10 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/dashboard" className="text-gray-400 hover:text-white transition">
+          <Link to={p("/dashboard")} className="text-gray-400 hover:text-white transition">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           {branding?.logo ? (

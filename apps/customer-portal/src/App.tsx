@@ -11,10 +11,19 @@ export default function App() {
     <BrowserRouter>
       <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
         <Routes>
+          {/* Subdomain-based (new): cargord.portal.syspaq.com/login */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/shipments/:id" element={<ShipmentDetail />} />
+
+          {/* Path-based (legacy): portal.syspaq.com/cargord/login */}
+          <Route path="/:slug/login" element={<Login />} />
+          <Route path="/:slug/register" element={<Register />} />
+          <Route path="/:slug/dashboard" element={<Dashboard />} />
+          <Route path="/:slug/shipments/:id" element={<ShipmentDetail />} />
+          <Route path="/:slug" element={<Navigate to="login" replace />} />
+
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </Suspense>

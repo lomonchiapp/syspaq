@@ -4,7 +4,7 @@ import { Package, FileText, LogOut, ChevronRight, Box } from "lucide-react";
 import { api } from "@/lib/api";
 import { clearSession, getCustomer, isAuthenticated } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
-import { useSlug } from "@/hooks/useSlug";
+import { useSlug, usePortalPath } from "@/hooks/useSlug";
 import { formatDate } from "@syspaq/ui";
 
 const PHASE_LABELS: Record<string, string> = {
@@ -50,6 +50,7 @@ interface Invoice {
 
 export default function Dashboard() {
   const slug = useSlug();
+  const p = usePortalPath();
   const navigate = useNavigate();
   const { branding } = useBranding(slug);
   const customer = getCustomer();
@@ -63,7 +64,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate("/login", { replace: true });
+      navigate(p("/login"), { replace: true });
       return;
     }
     api.get<{ data: Shipment[] }>("/portal/me/shipments")
@@ -78,7 +79,7 @@ export default function Dashboard() {
 
   function handleLogout() {
     clearSession();
-    navigate("/login");
+    navigate(p("/login"));
   }
 
   return (
@@ -159,7 +160,7 @@ export default function Dashboard() {
               shipments.map((s) => (
                 <Link
                   key={s.id}
-                  to={`/shipments/${s.id}`}
+                  to={p(`/shipments/${s.id}`)}
                   className="flex items-center justify-between rounded-xl bg-gray-900 border border-white/8 p-4 hover:border-white/20 transition"
                 >
                   <div className="space-y-1">

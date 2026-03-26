@@ -4,10 +4,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api";
 import { setSession } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
-import { useSlug } from "@/hooks/useSlug";
+import { useSlug, usePortalPath } from "@/hooks/useSlug";
 
 export default function Login() {
   const slug = useSlug();
+  const p = usePortalPath();
   const navigate = useNavigate();
   const { branding, loading: brandingLoading } = useBranding(slug);
 
@@ -30,7 +31,7 @@ export default function Login() {
       }>(`/portal/${slug}/auth/login`, { email, password });
 
       setSession(res.access_token, res.customer);
-      navigate("/dashboard");
+      navigate(p("/dashboard"));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesion");
     } finally {
@@ -109,7 +110,7 @@ export default function Login() {
 
           <p className="text-center text-sm text-gray-400 mt-5">
             No tienes cuenta?{" "}
-            <Link to="/register" className="font-medium hover:underline" style={{ color: primary }}>
+            <Link to={p("/register")} className="font-medium hover:underline" style={{ color: primary }}>
               Registrate
             </Link>
           </p>

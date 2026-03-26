@@ -1,36 +1,64 @@
+import { useParams } from "react-router-dom";
+
 /**
- * Extracts the tenant slug from the subdomain.
+ * Extracts the tenant slug from subdomain OR URL path (fallback).
  *
- * Expected format: {slug}.portal.syspaq.com
- * In development:  {slug}.localhost (or fallback to "demo")
- *
- * Override with VITE_PORTAL_SLUG env var for local dev.
+ * Priority:
+ *   1. VITE_PORTAL_SLUG env var (local dev override)
+ *   2. Subdomain: cargord.portal.syspaq.com → "cargord"
+ *   3. Path param: portal.syspaq.com/cargord/login → "cargord"
+ *   4. Fallback: "demo"
  */
 export function useSlug(): string {
-  // Allow override for local development
+  const params = useParams<{ slug?: string }>();
+
+  // 1. Env override for local dev
   const envSlug = import.meta.env.VITE_PORTAL_SLUG;
   if (envSlug) return envSlug;
 
   const hostname = window.location.hostname;
 
-  // Production: cargord.portal.syspaq.com → "cargord"
-  // The subdomain is everything before ".portal.syspaq.com"
+  // 2. Production subdomain: cargord.portal.syspaq.com → "cargord"
   const portalSuffix = ".portal.syspaq.com";
   if (hostname.endsWith(portalSuffix)) {
     return hostname.slice(0, -portalSuffix.length);
   }
 
-  // Dev: cargord.localhost → "cargord"
+  // 3. Dev subdomain: cargord.localhost → "cargord"
   if (hostname.endsWith(".localhost")) {
     return hostname.split(".")[0];
   }
 
-  // Custom domain: look up via API (future) — for now fallback
-  // If it's just "localhost" or "portal.syspaq.com" with no subdomain, use "demo"
+  // 4. Path-based fallback: /:slug/login → slug from URL params
+  if (params.slug) return params.slug;
+
+  // 5. Fallback
   if (hostname === "localhost" || hostname === "portal.syspaq.com") {
     return "demo";
   }
 
-  // For any other custom domain, the first part of the hostname
   return hostname.split(".")[0];
+}
+
+/**
+ * Returns true if the current request uses subdomain routing.
+ * When true, paths are clean (/login). When false, paths include slug (/:slug/login).
+ */
+function isSubdomainMode(): boolean {
+  const hostname = window.location.hostname;
+  if (import.meta.env.VITE_PORTAL_SLUG) return true;
+  if (hostname.endsWith(".portal.syspaq.com")) return true;
+  if (hostname.endsWith(".localhost")) return true;
+  return false;
+}
+
+/**
+ * Build a portal path that works in both subdomain and path-based modes.
+ * Usage: portalPath(slug, "/dashboard") → "/dashboard" or "/cargord/dashboard"
+ */
+export function usePortalPath() {
+  const slug = useSlug();
+  const subdomain = isSubdomainMode();
+
+  return (path: string) => (subdomain ? path : `/${slug}${path}`);
 }
