@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 
@@ -11,12 +11,16 @@ const DEMO_CREDENTIALS = {
 
 export default function DemoPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, isAuthenticated } = useAuthStore();
   const [error, setError] = useState("");
 
+  const tourMode = searchParams.get("tour") === "1";
+  const redirectPath = tourMode ? "/dashboard?tour=1" : "/dashboard";
+
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/dashboard", { replace: true });
+      navigate(redirectPath, { replace: true });
       return;
     }
 
@@ -29,7 +33,7 @@ export default function DemoPage() {
           DEMO_CREDENTIALS.password,
           DEMO_CREDENTIALS.tenant,
         );
-        if (!cancelled) navigate("/dashboard", { replace: true });
+        if (!cancelled) navigate(redirectPath, { replace: true });
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -68,7 +72,7 @@ export default function DemoPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--background)] px-4 gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)]" />
       <p className="text-sm text-[var(--muted-foreground)]">
-        Preparando el demo...
+        {tourMode ? "Preparando el tour guiado..." : "Preparando el demo..."}
       </p>
     </div>
   );

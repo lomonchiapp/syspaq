@@ -17,3 +17,52 @@
   --sidebar-border: var(--color-surface-200);
   --sidebar-accent: var(--color-primary-500);
 }
+
+/* Guided Tour (driver.js) overrides */
+.syspaq-tour-popover {
+  background: var(--card) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25) !important;
+}
+.syspaq-tour-popover .driver-popover-title {
+  font-family: var(--font-display), sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: var(--foreground) !important;
+}
+.syspaq-tour-popover .driver-popover-description {
+  color: var(--muted-foreground) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+.syspaq-tour-popover .driver-popover-progress-text {
+  color: var(--muted-foreground) !important;
+  font-size: 0.75rem !important;
+}
+.syspaq-tour-popover button.driver-popover-next-btn {
+  background: var(--primary) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 6px 16px !important;
+  text-shadow: none !important;
+}
+.syspaq-tour-popover button.driver-popover-prev-btn {
+  background: transparent !important;
+  color: var(--muted-foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 6px 16px !important;
+  text-shadow: none !important;
+}
+.syspaq-tour-popover button.driver-popover-close-btn {
+  color: var(--muted-foreground) !important;
+}
+.syspaq-tour-popover .driver-popover-footer {
+  border-top: 1px solid var(--border) !important;
+  padding-top: 12px !important;
+  margin-top: 12px !important;
+}

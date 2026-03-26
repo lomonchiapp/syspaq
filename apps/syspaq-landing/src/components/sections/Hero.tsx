@@ -104,9 +104,9 @@ export function Hero() {
               Comenzar Prueba Gratis
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button variant="secondary" href="#como-funciona">
+            <Button variant="secondary" href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/demo?tour=1`}>
               <Play className="h-4 w-4" />
-              Ver Cómo Funciona
+              Ver Como Funciona
             </Button>
           </motion.div>
         </div>
