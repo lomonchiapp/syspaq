@@ -18,79 +18,19 @@ function DashboardMockup() {
       <div className="relative overflow-hidden rounded-xl border border-surface-700/60 bg-surface-900 shadow-2xl">
         {/* Title bar */}
         <div className="flex items-center gap-2 border-b border-surface-700/60 px-4 py-3">
-          <div className="h-3 w-3 rounded-full bg-surface-600" />
-          <div className="h-3 w-3 rounded-full bg-surface-600" />
-          <div className="h-3 w-3 rounded-full bg-surface-600" />
+          <div className="h-3 w-3 rounded-full bg-red-500/70" />
+          <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
+          <div className="h-3 w-3 rounded-full bg-green-500/70" />
           <div className="ml-4 h-5 w-64 rounded bg-surface-800" />
         </div>
 
-        {/* Dashboard content mockup */}
-        <div className="p-6">
-          <div className="flex gap-6">
-            {/* Sidebar mock */}
-            <div className="hidden w-48 shrink-0 space-y-3 md:block">
-              <div className="h-8 w-32 rounded bg-primary-500/20" />
-              <div className="mt-6 space-y-2">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-6 rounded bg-surface-800"
-                    style={{ width: `${60 + Math.random() * 40}%` }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Main content mock */}
-            <div className="flex-1 space-y-4">
-              {/* KPI row */}
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {[
-                  { color: "bg-primary-500/20", border: "border-primary-500/30" },
-                  { color: "bg-accent-500/20", border: "border-accent-500/30" },
-                  { color: "bg-emerald-500/20", border: "border-emerald-500/30" },
-                  { color: "bg-purple-500/20", border: "border-purple-500/30" },
-                ].map((kpi, i) => (
-                  <div
-                    key={i}
-                    className={`rounded-lg border ${kpi.border} ${kpi.color} p-3`}
-                  >
-                    <div className="h-3 w-12 rounded bg-surface-600/50" />
-                    <div className="mt-2 h-6 w-16 rounded bg-surface-500/30" />
-                  </div>
-                ))}
-              </div>
-
-              {/* Chart mock */}
-              <div className="rounded-lg border border-surface-700/40 bg-surface-800/50 p-4">
-                <div className="h-3 w-32 rounded bg-surface-600/50" />
-                <div className="mt-4 flex items-end gap-1.5 h-28">
-                  {Array.from({ length: 16 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-t bg-gradient-to-t from-primary-500/40 to-primary-500/10"
-                      style={{ height: `${20 + Math.sin(i * 0.7) * 30 + Math.random() * 50}%` }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Table mock */}
-              <div className="rounded-lg border border-surface-700/40 bg-surface-800/50 p-4">
-                <div className="space-y-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="h-4 w-24 rounded bg-surface-600/30" />
-                      <div className="h-4 w-32 rounded bg-surface-600/20" />
-                      <div className="h-4 w-20 rounded bg-primary-500/20" />
-                      <div className="h-4 w-16 rounded bg-surface-600/20" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Screenshot */}
+        <img
+          src="/homedash.jpg"
+          alt="SysPaq Dashboard"
+          className="w-full object-cover object-top"
+          loading="eager"
+        />
       </div>
     </motion.div>
   );
