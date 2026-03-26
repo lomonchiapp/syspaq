@@ -569,6 +569,15 @@ export function usePostAlerts(page = 1, limit = 20) {
   });
 }
 
+export function useCreatePostAlert() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<PostAlertItem>) =>
+      api.post<PostAlertItem>("/v1/post-alerts", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["post-alerts"] }),
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /*  DGA Labels                                                         */
 /* ------------------------------------------------------------------ */

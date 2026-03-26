@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { formatCurrency, formatDateTime } from "@syspaq/ui";
 import { useReceptions } from "@/hooks/use-api";
 import type { Reception } from "@/types/api";
+import { CreateReceptionDialog } from "./create-reception-dialog";
 
 const columns: Column<Reception>[] = [
   {
@@ -57,6 +58,7 @@ const columns: Column<Reception>[] = [
 export default function ReceptionsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data, isLoading, isError, refetch } = useReceptions(page, 20, search);
 
@@ -71,7 +73,10 @@ export default function ReceptionsPage() {
         title="Recepciones"
         description="Paquetes recibidos en bodega"
       >
-        <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        >
           <Plus className="h-4 w-4" />
           Nueva Recepcion
         </button>
@@ -118,6 +123,8 @@ export default function ReceptionsPage() {
           />
         </>
       )}
+
+      <CreateReceptionDialog open={showCreate} onClose={() => setShowCreate(false)} />
     </div>
   );
 }

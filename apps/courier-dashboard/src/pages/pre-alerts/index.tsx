@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { formatCurrency, formatDate } from "@syspaq/ui";
 import { usePreAlerts } from "@/hooks/use-api";
 import type { PreAlert } from "@/types/api";
+import { CreatePreAlertDialog } from "./create-pre-alert-dialog";
 
 const columns: Column<PreAlert>[] = [
   {
@@ -57,6 +58,7 @@ export default function PreAlertsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [unlinkedOnly, setUnlinkedOnly] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data, isLoading, isError, refetch } = usePreAlerts(
     page,
@@ -73,7 +75,10 @@ export default function PreAlertsPage() {
   return (
     <div>
       <PageHeader title="Pre-Alertas" description="Paquetes pre-alertados por clientes">
-        <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        >
           <Plus className="h-4 w-4" />
           Nueva Pre-Alerta
         </button>
@@ -146,6 +151,8 @@ export default function PreAlertsPage() {
           />
         </>
       )}
+
+      <CreatePreAlertDialog open={showCreate} onClose={() => setShowCreate(false)} />
     </div>
   );
 }

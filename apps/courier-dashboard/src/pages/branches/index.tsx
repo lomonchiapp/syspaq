@@ -7,10 +7,12 @@ import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useBranches, useDeleteBranch } from "@/hooks/use-api";
 import type { Branch } from "@/types/api";
+import { CreateBranchDialog } from "./create-branch-dialog";
 
 export default function BranchesPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data, isLoading, isError, refetch } = useBranches(page, 20, search);
   const deleteBranch = useDeleteBranch();
@@ -86,7 +88,10 @@ export default function BranchesPage() {
         title="Sucursales"
         description="Bodegas y puntos de retiro"
       >
-        <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        >
           <Plus className="h-4 w-4" />
           Nueva Sucursal
         </button>
@@ -133,6 +138,8 @@ export default function BranchesPage() {
           />
         </>
       )}
+
+      <CreateBranchDialog open={showCreate} onClose={() => setShowCreate(false)} />
     </div>
   );
 }

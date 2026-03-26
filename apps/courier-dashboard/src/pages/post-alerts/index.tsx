@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
+import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@syspaq/ui";
 import { usePostAlerts } from "@/hooks/use-api";
 import type { PostAlertItem } from "@/types/api";
+import { CreatePostAlertDialog } from "./create-post-alert-dialog";
 
 const columns: Column<PostAlertItem>[] = [
   {
@@ -62,6 +64,7 @@ const columns: Column<PostAlertItem>[] = [
 
 export default function PostAlertsPage() {
   const [page, setPage] = useState(1);
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data, isLoading, isError, refetch } = usePostAlerts(page, 20);
 
@@ -74,7 +77,15 @@ export default function PostAlertsPage() {
       <PageHeader
         title="Post-Alertas"
         description="Confirmaciones post-entrega"
-      />
+      >
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        >
+          <Plus className="h-4 w-4" />
+          Nueva Post-Alerta
+        </button>
+      </PageHeader>
 
       {/* Error */}
       {isError && (
@@ -102,6 +113,8 @@ export default function PostAlertsPage() {
           />
         </>
       )}
+
+      <CreatePostAlertDialog open={showCreate} onClose={() => setShowCreate(false)} />
     </motion.div>
   );
 }

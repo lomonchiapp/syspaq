@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { cn } from "@syspaq/ui";
 import { PageHeader } from "@/components/shared/page-header";
@@ -9,6 +10,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { formatDate, formatDateTime } from "@syspaq/ui";
 import { useDeliveryOrders } from "@/hooks/use-api";
 import type { DeliveryOrder } from "@/types/api";
+import { CreateDeliveryOrderDialog } from "./create-delivery-order-dialog";
 
 function TypeBadge({ type }: { type: string }) {
   const colors: Record<string, string> = {
@@ -73,6 +75,8 @@ const columns: Column<DeliveryOrder>[] = [
 export default function DeliveryOrdersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
+  const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useDeliveryOrders(page, 20, search);
 
@@ -87,7 +91,10 @@ export default function DeliveryOrdersPage() {
         title="Ordenes de Entrega"
         description="Ultima milla y entregas"
       >
-        <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        >
           <Plus className="h-4 w-4" />
           Nueva Orden
         </button>
@@ -126,7 +133,7 @@ export default function DeliveryOrdersPage() {
             data={data?.data ?? []}
             isLoading={isLoading}
             emptyMessage="No se encontraron ordenes de entrega"
-            onRowClick={(d) => console.log("Navigate to /delivery-orders/" + d.id)}
+            onRowClick={(d) => navigate(`/delivery-orders/${d.id}`)}
           />
           <Pagination
             page={page}
@@ -135,6 +142,8 @@ export default function DeliveryOrdersPage() {
           />
         </>
       )}
+
+      <CreateDeliveryOrderDialog open={showCreate} onClose={() => setShowCreate(false)} />
     </div>
   );
 }

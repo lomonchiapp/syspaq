@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { formatDate } from "@syspaq/ui";
 import { useContainers } from "@/hooks/use-api";
 import type { Container } from "@/types/api";
+import { CreateContainerDialog } from "./create-container-dialog";
 
 function ModeBadge({ mode }: { mode: string }) {
   const isSea = mode === "SEA";
@@ -75,6 +76,7 @@ const columns: Column<Container>[] = [
 export default function ContainersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
   const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useContainers(page, 20, search);
@@ -90,7 +92,10 @@ export default function ContainersPage() {
         title="Contenedores"
         description="Consolidacion maritima y aerea"
       >
-        <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        >
           <Plus className="h-4 w-4" />
           Nuevo Contenedor
         </button>
@@ -138,6 +143,8 @@ export default function ContainersPage() {
           />
         </>
       )}
+
+      <CreateContainerDialog open={showCreate} onClose={() => setShowCreate(false)} />
     </div>
   );
 }
