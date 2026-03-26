@@ -673,8 +673,8 @@ async function seedBlumbox(pepper: string) {
     }),
   ]);
 
-  const [miamiBranch, sdqBranch, _stiBranch, _lrmBranch] = branches;
-  void _stiBranch; void _lrmBranch;
+  const [miamiBranch, _sdqBranch, _stiBranch, _lrmBranch] = branches;
+  void _sdqBranch; void _stiBranch; void _lrmBranch;
 
   // ── Customers ──
   const passwordHash = await bcryptHash("blumbox2025", 12);
