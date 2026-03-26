@@ -22,6 +22,7 @@ import {
   ShoppingCart,
   Upload,
   Settings,
+  Car,
   Sun,
   Moon,
   Menu,
@@ -31,6 +32,8 @@ import {
   ChevronUp,
   Palette,
   User,
+  ScrollText,
+  LifeBuoy,
 } from "lucide-react";
 import { cn } from "@syspaq/ui";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -74,7 +77,13 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: "Contenedores", path: "/containers", icon: Ship, permission: "containers" },
       { label: "DGA", path: "/dga", icon: FileCheck, permission: "dga" },
-      { label: "Ordenes de Entrega", path: "/delivery-orders", icon: Truck, permission: "delivery-orders" },
+      { label: "Ordenes Entrega", path: "/delivery-orders", icon: Truck, permission: "delivery-orders" },
+    ],
+  },
+  {
+    title: "Flota",
+    items: [
+      { label: "Panel Flota", path: "/fleet", icon: Car, permission: "fleet" },
     ],
   },
   {
@@ -84,6 +93,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Pagos", path: "/payments", icon: CreditCard, permission: "payments" },
       { label: "Notas de Credito", path: "/credit-notes", icon: ReceiptText, permission: "credit-notes" },
       { label: "Caja Chica", path: "/caja-chica", icon: Vault, permission: "caja-chica" },
+      { label: "Fiscal", path: "/fiscal", icon: ScrollText, permission: "fiscal" },
     ],
   },
   {
@@ -96,6 +106,12 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "E-commerce", path: "/ecommerce", icon: ShoppingCart, permission: "ecommerce" },
       { label: "Import", path: "/bulk-import", icon: Upload, permission: "bulk-import" },
       { label: "Ajustes", path: "/settings", icon: Settings, permission: "settings" },
+    ],
+  },
+  {
+    title: "Soporte",
+    items: [
+      { label: "Tickets", path: "/tickets", icon: LifeBuoy, permission: "tickets" },
     ],
   },
 ];

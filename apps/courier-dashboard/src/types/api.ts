@@ -617,3 +617,191 @@ export interface CajaChicaBranchSummary {
   sessionId?: string;
   openedAt?: string;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Driver                                                     */
+/* ------------------------------------------------------------------ */
+
+export interface Driver {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  licenseNumber?: string;
+  licenseType?: string;
+  status: string;
+  vehicleId?: string;
+  vehicle?: Vehicle;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Vehicle                                                    */
+/* ------------------------------------------------------------------ */
+
+export interface Vehicle {
+  id: string;
+  plate: string;
+  brand: string;
+  model: string;
+  year?: number;
+  type: string;
+  capacityWeightLbs?: number;
+  capacityVolumeCbft?: number;
+  status: string;
+  currentBranchId?: string;
+  currentBranch?: { name: string; code: string };
+  mileage?: number;
+  fuelType?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Route                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface RouteItem {
+  id: string;
+  number: string;
+  driverId: string;
+  vehicleId?: string;
+  branchId: string;
+  status: string;
+  plannedDate: string;
+  startedAt?: string;
+  completedAt?: string;
+  totalStops: number;
+  completedStops: number;
+  notes?: string;
+  driver?: { firstName: string; lastName: string };
+  vehicle?: { plate: string; brand: string; model: string };
+  branch?: { name: string; code: string };
+  createdAt: string;
+}
+
+export interface RouteStop {
+  id: string;
+  routeId: string;
+  deliveryOrderId: string;
+  sequence: number;
+  status: string;
+  estimatedArrival?: string;
+  actualArrival?: string;
+  actualDeparture?: string;
+  notes?: string;
+  deliveryOrder?: DeliveryOrder;
+}
+
+export interface RouteDetail extends RouteItem {
+  stops: RouteStop[];
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Dashboard                                                  */
+/* ------------------------------------------------------------------ */
+
+export interface FleetDashboardData {
+  availableDrivers: number;
+  availableVehicles: number;
+  activeRoutes: number;
+  plannedRoutes: number;
+  completedToday: number;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fiscal Compliance                                                  */
+/* ------------------------------------------------------------------ */
+
+export interface FiscalSequence {
+  id: string;
+  type: string;
+  prefix: string;
+  currentNumber: number;
+  authorizationNumber?: string;
+  validFrom: string;
+  validUntil: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface FiscalReport {
+  id: string;
+  type: string;
+  period: string;
+  status: string;
+  generatedAt?: string;
+  data: unknown;
+  createdAt: string;
+}
+
+export interface AgingBucket {
+  customerId: string;
+  customerName: string;
+  casillero: string;
+  current: number;
+  days30: number;
+  days60: number;
+  days90: number;
+  days90Plus: number;
+  total: number;
+}
+
+export interface FiscalSummary {
+  period: string;
+  totalSales: number;
+  totalITBIS: number;
+  totalCreditNotes: number;
+  netSales: number;
+  ncfsByType: Record<string, number>;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tickets (Help Desk)                                                */
+/* ------------------------------------------------------------------ */
+
+export interface Ticket {
+  id: string;
+  number: string;
+  customerId?: string;
+  subject: string;
+  description: string;
+  category: string;
+  priority: string;
+  status: string;
+  assignedToId?: string;
+  shipmentId?: string;
+  invoiceId?: string;
+  resolvedAt?: string;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  customer?: { firstName: string; lastName: string; casillero: string; email: string };
+}
+
+export interface TicketComment {
+  id: string;
+  ticketId: string;
+  authorType: string;
+  authorId: string;
+  authorName: string;
+  body: string;
+  isInternal: boolean;
+  attachments: string[];
+  createdAt: string;
+}
+
+export interface TicketDetail extends Ticket {
+  comments: TicketComment[];
+}
+
+export interface TicketStats {
+  byStatus: Record<string, number>;
+  byPriority: Record<string, number>;
+  byCategory: Record<string, number>;
+  avgResolutionHours: number;
+  openCount: number;
+  resolvedThisMonth: number;
+}

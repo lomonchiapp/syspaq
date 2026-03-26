@@ -29,6 +29,23 @@ const STATUS_COLORS: Record<string, string> = {
   // Generic
   ACTIVE: "bg-emerald-500/15 text-emerald-400",
   INACTIVE: "bg-gray-500/15 text-gray-400",
+  // Fleet - Driver
+  ON_LEAVE: "bg-amber-500/15 text-amber-400",
+  // Fleet - Vehicle
+  AVAILABLE: "bg-emerald-500/15 text-emerald-400",
+  IN_USE: "bg-blue-500/15 text-blue-400",
+  MAINTENANCE: "bg-amber-500/15 text-amber-400",
+  RETIRED: "bg-gray-500/15 text-gray-400",
+  // Fleet - Route
+  PLANNED: "bg-blue-500/15 text-blue-400",
+  IN_PROGRESS: "bg-cyan-500/15 text-cyan-400",
+  COMPLETED: "bg-emerald-500/15 text-emerald-400",
+  // Fleet - Stop
+  ARRIVED: "bg-cyan-500/15 text-cyan-400",
+  SKIPPED: "bg-gray-500/15 text-gray-400",
+  // Tickets
+  WAITING_CUSTOMER: "bg-amber-500/15 text-amber-400",
+  RESOLVED: "bg-emerald-500/15 text-emerald-400",
 };
 
 export function StatusBadge({ status }: { status: string }) {

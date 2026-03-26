@@ -34,6 +34,16 @@ const BulkImportPage = lazy(() => import("@/pages/bulk-import"));
 const SettingsPage = lazy(() => import("@/pages/settings"));
 const CajaChicaPage = lazy(() => import("@/pages/caja-chica"));
 const CajaChicaDetailPage = lazy(() => import("@/pages/caja-chica/[id]"));
+const FleetPage = lazy(() => import("@/pages/fleet"));
+const DriverDetailPage = lazy(() => import("@/pages/fleet/drivers/[id]"));
+const VehicleDetailPage = lazy(() => import("@/pages/fleet/vehicles/[id]"));
+const RouteDetailPage = lazy(() => import("@/pages/fleet/routes/[id]"));
+const FiscalPage = lazy(() => import("@/pages/fiscal"));
+const FiscalSequencesPage = lazy(() => import("@/pages/fiscal/sequences"));
+const FiscalReportsPage = lazy(() => import("@/pages/fiscal/reports"));
+const FiscalAgingPage = lazy(() => import("@/pages/fiscal/aging"));
+const TicketsPage = lazy(() => import("@/pages/tickets"));
+const TicketDetailPage = lazy(() => import("@/pages/tickets/[id]"));
 const AdminPage = lazy(() => import("@/pages/admin"));
 const AdminTenantDetailPage = lazy(() => import("@/pages/admin/tenants/[id]"));
 
@@ -78,12 +88,22 @@ export default function App() {
               <Route path="branches" element={<BranchesPage />} />
               <Route path="rate-tables" element={<RateTablesPage />} />
               <Route path="rate-tables/:id" element={<RateTableDetailPage />} />
+              <Route path="fleet" element={<FleetPage />} />
+              <Route path="fleet/drivers/:id" element={<DriverDetailPage />} />
+              <Route path="fleet/vehicles/:id" element={<VehicleDetailPage />} />
+              <Route path="fleet/routes/:id" element={<RouteDetailPage />} />
+              <Route path="fiscal" element={<FiscalPage />} />
+              <Route path="fiscal/sequences" element={<FiscalSequencesPage />} />
+              <Route path="fiscal/reports" element={<FiscalReportsPage />} />
+              <Route path="fiscal/aging" element={<FiscalAgingPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="webhooks" element={<WebhooksPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="ecommerce" element={<EcommercePage />} />
               <Route path="bulk-import" element={<BulkImportPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="tickets" element={<TicketsPage />} />
+              <Route path="tickets/:id" element={<TicketDetailPage />} />
               <Route path="admin" element={<AdminPage />} />
               <Route path="admin/tenants/:id" element={<AdminTenantDetailPage />} />
             </Route>

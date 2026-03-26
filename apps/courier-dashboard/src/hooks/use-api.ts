@@ -45,6 +45,18 @@ import type {
   CajaChicaSession,
   CajaChicaTransaction,
   CajaChicaBranchSummary,
+  Driver,
+  Vehicle,
+  RouteItem,
+  RouteDetail,
+  FleetDashboardData,
+  FiscalSequence,
+  FiscalReport,
+  AgingBucket,
+  FiscalSummary,
+  Ticket,
+  TicketDetail,
+  TicketStats,
 } from "@/types/api";
 
 /* ------------------------------------------------------------------ */
@@ -1110,5 +1122,246 @@ export function useCreateCajaTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["caja-chica"] });
     },
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fiscal Compliance                                                  */
+/* ------------------------------------------------------------------ */
+
+export function useFiscalSequences() {
+  return useQuery({
+    queryKey: ["fiscal", "sequences"],
+    queryFn: () => api.get<{ data: FiscalSequence[] }>("/v1/fiscal/sequences"),
+  });
+}
+
+export function useCreateFiscalSequence() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<FiscalSequence>) =>
+      api.post("/v1/fiscal/sequences", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fiscal"] }),
+  });
+}
+
+export function useFiscalReport607(period: string) {
+  return useQuery({
+    queryKey: ["fiscal", "607", period],
+    queryFn: () => api.get<FiscalReport>(`/v1/fiscal/reports/607?period=${period}`),
+    enabled: !!period,
+  });
+}
+
+export function useFiscalAging() {
+  return useQuery({
+    queryKey: ["fiscal", "aging"],
+    queryFn: () => api.get<{ data: AgingBucket[]; totals: AgingBucket }>("/v1/fiscal/reports/aging"),
+  });
+}
+
+export function useFiscalSummary(period: string) {
+  return useQuery({
+    queryKey: ["fiscal", "summary", period],
+    queryFn: () => api.get<FiscalSummary>(`/v1/fiscal/summary?period=${period}`),
+    enabled: !!period,
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tickets                                                            */
+/* ------------------------------------------------------------------ */
+
+export function useTickets(page = 1, limit = 20, status = "", priority = "", category = "") {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) params.set("status", status);
+  if (priority) params.set("priority", priority);
+  if (category) params.set("category", category);
+  return useQuery({
+    queryKey: ["tickets", page, limit, status, priority, category],
+    queryFn: () => api.get<PaginatedResponse<Ticket>>(`/v1/tickets?${params}`),
+  });
+}
+
+export function useTicket(id: string) {
+  return useQuery({
+    queryKey: ["tickets", id],
+    queryFn: () => api.get<TicketDetail>(`/v1/tickets/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreateTicket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => api.post<Ticket>("/v1/tickets", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
+  });
+}
+
+export function useUpdateTicket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: any) => api.patch<Ticket>(`/v1/tickets/${id}`, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
+  });
+}
+
+export function useAddTicketComment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ticketId, ...data }: any) => api.post(`/v1/tickets/${ticketId}/comments`, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
+  });
+}
+
+export function useAssignTicket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, assignedToId }: { id: string; assignedToId: string }) =>
+      api.post(`/v1/tickets/${id}/assign`, { assignedToId }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
+  });
+}
+
+export function useResolveTicket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/v1/tickets/${id}/resolve`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
+  });
+}
+
+export function useCloseTicket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/v1/tickets/${id}/close`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
+  });
+}
+
+export function useTicketStats() {
+  return useQuery({
+    queryKey: ["tickets", "stats"],
+    queryFn: () => api.get<TicketStats>("/v1/tickets/stats"),
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Drivers                                                    */
+/* ------------------------------------------------------------------ */
+
+export function useDrivers(page = 1, limit = 20, status = "") {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) params.set("status", status);
+  return useQuery({
+    queryKey: ["fleet", "drivers", page, limit, status],
+    queryFn: () => api.get<PaginatedResponse<Driver>>(`/v1/fleet/drivers?${params}`),
+  });
+}
+
+export function useDriver(id: string) {
+  return useQuery({
+    queryKey: ["fleet", "drivers", id],
+    queryFn: () => api.get<Driver>(`/v1/fleet/drivers/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreateDriver() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Driver>) => api.post<Driver>("/v1/fleet/drivers", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fleet"] }),
+  });
+}
+
+export function useUpdateDriver() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: Partial<Driver> & { id: string }) =>
+      api.patch<Driver>(`/v1/fleet/drivers/${id}`, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fleet"] }),
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Vehicles                                                   */
+/* ------------------------------------------------------------------ */
+
+export function useVehicles(page = 1, limit = 20, status = "") {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) params.set("status", status);
+  return useQuery({
+    queryKey: ["fleet", "vehicles", page, limit, status],
+    queryFn: () => api.get<PaginatedResponse<Vehicle>>(`/v1/fleet/vehicles?${params}`),
+  });
+}
+
+export function useVehicle(id: string) {
+  return useQuery({
+    queryKey: ["fleet", "vehicles", id],
+    queryFn: () => api.get<Vehicle>(`/v1/fleet/vehicles/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreateVehicle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Vehicle>) => api.post<Vehicle>("/v1/fleet/vehicles", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fleet"] }),
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Fleet - Routes                                                     */
+/* ------------------------------------------------------------------ */
+
+export function useRoutes(page = 1, limit = 20, status = "") {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) params.set("status", status);
+  return useQuery({
+    queryKey: ["fleet", "routes", page, limit, status],
+    queryFn: () => api.get<PaginatedResponse<RouteItem>>(`/v1/fleet/routes?${params}`),
+  });
+}
+
+export function useRoute(id: string) {
+  return useQuery({
+    queryKey: ["fleet", "routes", id],
+    queryFn: () => api.get<RouteDetail>(`/v1/fleet/routes/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreateRoute() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => api.post<RouteItem>("/v1/fleet/routes", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fleet"] }),
+  });
+}
+
+export function useStartRoute() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/v1/fleet/routes/${id}/start`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fleet"] }),
+  });
+}
+
+export function useCompleteRoute() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/v1/fleet/routes/${id}/complete`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["fleet"] }),
+  });
+}
+
+export function useFleetDashboard() {
+  return useQuery({
+    queryKey: ["fleet", "dashboard"],
+    queryFn: () => api.get<FleetDashboardData>("/v1/fleet/routes/dashboard"),
   });
 }

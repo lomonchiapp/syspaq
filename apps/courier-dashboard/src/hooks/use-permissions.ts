@@ -6,11 +6,12 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     "invoices", "payments", "containers", "dga", "delivery-orders",
     "branches", "rate-tables", "analytics", "webhooks", "notifications",
     "ecommerce", "bulk-import", "settings", "post-alerts", "credit-notes",
+    "caja-chica", "fleet", "fiscal", "tickets",
   ],
   OPERATOR: [
     "dashboard", "customers", "shipments", "pre-alerts", "receptions",
     "invoices", "payments", "containers", "dga", "delivery-orders",
-    "branches", "analytics", "post-alerts",
+    "branches", "analytics", "post-alerts", "caja-chica", "fleet", "tickets",
   ],
   INTEGRATION: ["dashboard", "shipments", "analytics"],
 };
