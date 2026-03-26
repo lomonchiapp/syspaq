@@ -14,6 +14,7 @@ import {
   FileText,
   CreditCard,
   ReceiptText,
+  Vault,
   Building2,
   Calculator,
   Webhook,
@@ -82,6 +83,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Facturas", path: "/invoices", icon: FileText, permission: "invoices" },
       { label: "Pagos", path: "/payments", icon: CreditCard, permission: "payments" },
       { label: "Notas de Credito", path: "/credit-notes", icon: ReceiptText, permission: "credit-notes" },
+      { label: "Caja Chica", path: "/caja-chica", icon: Vault, permission: "caja-chica" },
     ],
   },
   {

@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
 } from "class-validator";
 import { IdDocType } from "./register-customer.dto";
@@ -46,4 +47,9 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsString()
   casillero?: string;
+
+  @ApiPropertyOptional({ description: "Preferred branch for pickup" })
+  @IsOptional()
+  @IsUUID()
+  preferredBranchId?: string;
 }

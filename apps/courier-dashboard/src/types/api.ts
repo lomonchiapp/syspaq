@@ -569,3 +569,51 @@ export interface CustomerDetail extends Customer {
   invoiceCount?: number;
   receptionCount?: number;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Caja Chica                                                         */
+/* ------------------------------------------------------------------ */
+
+export interface CajaChicaSession {
+  id: string;
+  tenantId: string;
+  branchId: string;
+  branch?: { id: string; name: string; code: string };
+  openedById: string;
+  closedById?: string;
+  status: string;
+  openingBalance: number;
+  closingBalance?: number;
+  physicalCount?: number;
+  difference?: number;
+  currency: string;
+  notes?: string;
+  openedAt: string;
+  closedAt?: string;
+  transactions?: CajaChicaTransaction[];
+}
+
+export interface CajaChicaTransaction {
+  id: string;
+  sessionId: string;
+  branchId: string;
+  type: string;
+  amount: number;
+  balance: number;
+  currency: string;
+  description: string;
+  paymentId?: string;
+  reference?: string;
+  createdAt: string;
+}
+
+export interface CajaChicaBranchSummary {
+  branchId: string;
+  branchName: string;
+  branchCode: string;
+  hasOpenSession: boolean;
+  currentBalance: number;
+  currency: string;
+  sessionId?: string;
+  openedAt?: string;
+}

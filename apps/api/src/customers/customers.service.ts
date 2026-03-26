@@ -38,6 +38,7 @@ export class CustomersService {
             phone: dto.phone,
             idType: dto.idType,
             idNumber: dto.idNumber,
+            preferredBranchId: dto.preferredBranchId,
             casillero,
           },
         });
@@ -77,6 +78,7 @@ export class CustomersService {
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
+        include: { preferredBranch: { select: { id: true, name: true, code: true } } },
       }),
       this.prisma.customer.count({ where }),
     ]);
@@ -90,6 +92,7 @@ export class CustomersService {
   async findOne(tenantId: string, id: string) {
     const customer = await this.prisma.customer.findFirst({
       where: { id, tenantId },
+      include: { preferredBranch: { select: { id: true, name: true, code: true } } },
     });
     if (!customer) throw new NotFoundException("Customer not found");
     return this.sanitize(customer);

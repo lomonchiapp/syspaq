@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
   MinLength,
 } from "class-validator";
@@ -50,4 +51,9 @@ export class RegisterCustomerDto {
   @IsString()
   @MaxLength(20)
   idNumber?: string;
+
+  @ApiPropertyOptional({ description: "Preferred branch for pickup" })
+  @IsOptional()
+  @IsUUID()
+  preferredBranchId?: string;
 }

@@ -64,6 +64,11 @@ export class RecordPaymentDto {
   @IsUUID()
   customerId?: string;
 
+  @ApiPropertyOptional({ description: "Branch where payment was collected" })
+  @IsOptional()
+  @IsUUID()
+  branchId?: string;
+
   @ApiProperty({ type: [PaymentAllocationDto] })
   @IsArray()
   @ArrayMinSize(1)

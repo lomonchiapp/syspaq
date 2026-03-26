@@ -32,6 +32,8 @@ const NotificationsPage = lazy(() => import("@/pages/notifications"));
 const EcommercePage = lazy(() => import("@/pages/ecommerce"));
 const BulkImportPage = lazy(() => import("@/pages/bulk-import"));
 const SettingsPage = lazy(() => import("@/pages/settings"));
+const CajaChicaPage = lazy(() => import("@/pages/caja-chica"));
+const CajaChicaDetailPage = lazy(() => import("@/pages/caja-chica/[id]"));
 const AdminPage = lazy(() => import("@/pages/admin"));
 const AdminTenantDetailPage = lazy(() => import("@/pages/admin/tenants/[id]"));
 
@@ -71,6 +73,8 @@ export default function App() {
               <Route path="invoices/:id" element={<InvoiceDetailPage />} />
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="credit-notes" element={<CreditNotesPage />} />
+              <Route path="caja-chica" element={<CajaChicaPage />} />
+              <Route path="caja-chica/:id" element={<CajaChicaDetailPage />} />
               <Route path="branches" element={<BranchesPage />} />
               <Route path="rate-tables" element={<RateTablesPage />} />
               <Route path="rate-tables/:id" element={<RateTableDetailPage />} />

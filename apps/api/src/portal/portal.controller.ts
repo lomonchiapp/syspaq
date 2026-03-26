@@ -12,6 +12,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 import { Public } from "@/common/decorators/public.decorator";
 import { PortalService } from "./portal.service";
+import { RegisterCustomerDto } from "@/customers/dto/register-customer.dto";
 import { PortalLoginDto } from "./dto/portal-login.dto";
 import { CustomerJwtGuard } from "./guards/customer-jwt.guard";
 
@@ -34,6 +35,13 @@ export class PortalController {
   @ApiOperation({ summary: "Customer login for tenant portal" })
   login(@Param("slug") slug: string, @Body() dto: PortalLoginDto) {
     return this.portal.login(slug, dto);
+  }
+
+  @Public()
+  @Post(":slug/auth/register")
+  @ApiOperation({ summary: "Customer self-registration" })
+  register(@Param("slug") slug: string, @Body() dto: RegisterCustomerDto) {
+    return this.portal.register(slug, dto);
   }
 
   @Public()

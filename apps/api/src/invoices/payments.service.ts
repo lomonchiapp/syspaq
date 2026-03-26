@@ -3,13 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InvoiceStatus, Prisma } from "@prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async record(tenantId: string, dto: RecordPaymentDto) {
     // Validate that allocation amounts sum to payment amount
@@ -20,7 +24,7 @@ export class PaymentsService {
       );
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // Validate all invoices exist and belong to tenant
       for (const alloc of dto.allocations) {
         const invoice = await tx.invoice.findFirst({
@@ -58,6 +62,7 @@ export class PaymentsService {
           reference: dto.reference,
           bankName: dto.bankName,
           notes: dto.notes,
+          branchId: dto.branchId,
           allocations: {
             create: dto.allocations.map((alloc) => ({
               invoiceId: alloc.invoiceId,
@@ -95,6 +100,20 @@ export class PaymentsService {
 
       return payment;
     });
+
+    // Emit event for cash payments at a branch
+    if (dto.method === "CASH" && dto.branchId) {
+      this.eventEmitter.emit("payment.recorded", {
+        tenantId,
+        paymentId: result.id,
+        branchId: dto.branchId,
+        method: dto.method,
+        amount: Number(dto.amount),
+        currency: dto.currency || "USD",
+      });
+    }
+
+    return result;
   }
 
   async list(

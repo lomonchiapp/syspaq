@@ -22,6 +22,10 @@ const STATUS_COLORS: Record<string, string> = {
   PENDING: "bg-gray-500/15 text-gray-400",
   ASSIGNED: "bg-blue-500/15 text-blue-400",
   FAILED: "bg-red-500/15 text-red-400",
+  // Caja Chica
+  OPEN: "bg-emerald-500/15 text-emerald-400",
+  CLOSED: "bg-gray-500/15 text-gray-400",
+  RECONCILED: "bg-blue-500/15 text-blue-400",
   // Generic
   ACTIVE: "bg-emerald-500/15 text-emerald-400",
   INACTIVE: "bg-gray-500/15 text-gray-400",

@@ -109,7 +109,18 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-center text-[11px] text-gray-600 mt-6">
+          <p className="text-center text-sm text-gray-400 mt-5">
+            No tienes cuenta?{" "}
+            <a
+              href={`/${slug}/register`}
+              className="font-medium hover:underline"
+              style={{ color: primary }}
+            >
+              Registrate
+            </a>
+          </p>
+
+          <p className="text-center text-[11px] text-gray-600 mt-5">
             Powered by{" "}
             <a href="https://syspaq.com" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400">
               SysPaq

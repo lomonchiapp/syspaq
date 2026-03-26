@@ -42,6 +42,9 @@ import type {
   BulkImportDetail,
   TenantSettings,
   ApiKeyItem,
+  CajaChicaSession,
+  CajaChicaTransaction,
+  CajaChicaBranchSummary,
 } from "@/types/api";
 
 /* ------------------------------------------------------------------ */
@@ -1024,5 +1027,88 @@ export function useAdminRenewals(days = 30) {
     queryKey: ["admin", "renewals", days],
     queryFn: () =>
       api.get<AdminTenant[]>(`/v1/admin/renewals?days=${days}`),
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Caja Chica                                                         */
+/* ------------------------------------------------------------------ */
+
+export function useCajaChicaSummary() {
+  return useQuery({
+    queryKey: ["caja-chica", "summary"],
+    queryFn: () => api.get<{ data: CajaChicaBranchSummary[] }>("/v1/caja-chica/summary"),
+  });
+}
+
+export function useCajaChicaSessions(page = 1, limit = 20, branchId = "", status = "") {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (branchId) params.set("branchId", branchId);
+  if (status) params.set("status", status);
+  return useQuery({
+    queryKey: ["caja-chica", "sessions", page, limit, branchId, status],
+    queryFn: () => api.get<PaginatedResponse<CajaChicaSession>>(`/v1/caja-chica/sessions?${params}`),
+  });
+}
+
+export function useCajaChicaSessionDetail(id: string) {
+  return useQuery({
+    queryKey: ["caja-chica", "sessions", id],
+    queryFn: () => api.get<CajaChicaSession>(`/v1/caja-chica/sessions/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCajaChicaTransactions(page = 1, limit = 50, sessionId = "", branchId = "") {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (sessionId) params.set("sessionId", sessionId);
+  if (branchId) params.set("branchId", branchId);
+  return useQuery({
+    queryKey: ["caja-chica", "transactions", page, limit, sessionId, branchId],
+    queryFn: () => api.get<PaginatedResponse<CajaChicaTransaction>>(`/v1/caja-chica/transactions?${params}`),
+  });
+}
+
+export function useOpenCajaSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { branchId: string; openingBalance?: number; notes?: string }) =>
+      api.post<CajaChicaSession>("/v1/caja-chica/sessions", data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["caja-chica"] });
+    },
+  });
+}
+
+export function useCloseCajaSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: { id: string; notes?: string }) =>
+      api.post<CajaChicaSession>(`/v1/caja-chica/sessions/${id}/close`, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["caja-chica"] });
+    },
+  });
+}
+
+export function useReconcileCajaSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: { id: string; physicalCount: number; notes?: string }) =>
+      api.post<CajaChicaSession>(`/v1/caja-chica/sessions/${id}/reconcile`, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["caja-chica"] });
+    },
+  });
+}
+
+export function useCreateCajaTransaction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { branchId: string; type: string; amount: number; description: string; reference?: string }) =>
+      api.post<CajaChicaTransaction>("/v1/caja-chica/transactions", data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["caja-chica"] });
+    },
   });
 }

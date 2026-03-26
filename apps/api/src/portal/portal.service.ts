@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -6,7 +8,9 @@ import {
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
+import { RegisterCustomerDto } from "@/customers/dto/register-customer.dto";
 import { PortalLoginDto } from "./dto/portal-login.dto";
 
 @Injectable()
@@ -32,12 +36,19 @@ export class PortalService {
 
     if (!tenant) throw new NotFoundException("Tenant not found");
 
+    const branches = await this.prisma.branch.findMany({
+      where: { tenantId: tenant.id, isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, code: true, type: true, address: true },
+    });
+
     return {
       companyName: tenant.portalCompanyName ?? tenant.name,
       logo: tenant.portalLogo ?? null,
       primaryColor: tenant.portalPrimaryColor ?? "#01b9bf",
       bgImage: tenant.portalBgImage ?? null,
       welcomeText: tenant.portalWelcomeText ?? `Bienvenido a ${tenant.portalCompanyName ?? tenant.name}`,
+      branches,
     };
   }
 
@@ -182,6 +193,84 @@ export class PortalService {
       data: items,
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
+  }
+
+  async register(slug: string, dto: RegisterCustomerDto) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { slug },
+    });
+    if (!tenant) throw new NotFoundException("Tenant not found");
+
+    // Validate preferred branch if provided
+    if (dto.preferredBranchId) {
+      const branch = await this.prisma.branch.findFirst({
+        where: { id: dto.preferredBranchId, tenantId: tenant.id, isActive: true },
+      });
+      if (!branch) throw new BadRequestException("Branch not found");
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    try {
+      // Generate casillero and create customer in a transaction
+      const customer = await this.prisma.$transaction(async (tx) => {
+        const t = await tx.tenant.update({
+          where: { id: tenant.id },
+          data: { casilleroCounter: { increment: 1 } },
+        });
+        const casillero = `${t.casilleroPrefix}-${String(t.casilleroCounter).padStart(5, "0")}`;
+
+        return tx.customer.create({
+          data: {
+            tenantId: tenant.id,
+            email: dto.email.toLowerCase().trim(),
+            passwordHash,
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            phone: dto.phone,
+            idType: dto.idType,
+            idNumber: dto.idNumber,
+            preferredBranchId: dto.preferredBranchId,
+            casillero,
+          },
+        });
+      });
+
+      // Generate JWT using the same pattern as login()
+      const secret = this.config.get<string>("customerJwtSecret");
+      const accessToken = jwt.sign(
+        {
+          sub: customer.id,
+          tenantId: customer.tenantId,
+          email: customer.email,
+          type: "customer",
+        },
+        secret!,
+        { expiresIn: "7d" },
+      );
+
+      return {
+        access_token: accessToken,
+        token_type: "Bearer" as const,
+        expires_in: 604800,
+        customer: {
+          id: customer.id,
+          email: customer.email,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+          casillero: customer.casillero,
+        },
+      };
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === "P2002"
+      ) {
+        throw new ConflictException("Email already registered");
+      }
+      throw e;
+    }
   }
 
   /** Public tracking — no auth, just tracking number */
