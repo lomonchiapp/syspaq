@@ -97,7 +97,7 @@ export class CustomerAuthService {
     const [result] = await tx.$queryRaw<
       { casillero_prefix: string; casillero_counter: number }[]
     >`
-      UPDATE tenants
+      UPDATE "Tenant"
       SET casillero_counter = casillero_counter + 1, updated_at = NOW()
       WHERE id = ${tenantId}
       RETURNING casillero_prefix, casillero_counter
