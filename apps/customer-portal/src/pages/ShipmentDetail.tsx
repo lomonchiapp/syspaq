@@ -4,17 +4,18 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import { api } from "@/lib/api";
 import { isAuthenticated } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
+import { useSlug } from "@/hooks/useSlug";
 import { formatDate } from "@syspaq/ui";
 
 const PHASE_LABELS: Record<string, string> = {
   CREATED: "Creado",
-  IN_TRANSIT: "En tránsito",
-  AT_WAREHOUSE: "En almacén",
+  IN_TRANSIT: "En transito",
+  AT_WAREHOUSE: "En almacen",
   IN_CUSTOMS: "En aduana",
   OUT_FOR_DELIVERY: "En camino",
   DELIVERED: "Entregado",
   RETURNED: "Devuelto",
-  EXCEPTION: "Excepción",
+  EXCEPTION: "Excepcion",
 };
 
 interface TrackingEvent {
@@ -24,7 +25,7 @@ interface TrackingEvent {
   location?: { city?: string; country?: string } | null;
 }
 
-interface ShipmentDetail {
+interface ShipmentDetailData {
   id: string;
   trackingNumber: string;
   reference: string | null;
@@ -34,30 +35,31 @@ interface ShipmentDetail {
 }
 
 export default function ShipmentDetail() {
-  const { slug, id } = useParams<{ slug: string; id: string }>();
+  const { id } = useParams<{ id: string }>();
+  const slug = useSlug();
   const navigate = useNavigate();
-  const { branding } = useBranding(slug!);
-  const [shipment, setShipment] = useState<ShipmentDetail | null>(null);
+  const { branding } = useBranding(slug);
+  const [shipment, setShipment] = useState<ShipmentDetailData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const primary = branding?.primaryColor ?? "#01b9bf";
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate(`/${slug}/login`, { replace: true });
+      navigate("/login", { replace: true });
       return;
     }
-    api.get<ShipmentDetail>(`/portal/me/shipments/${id}`)
+    api.get<ShipmentDetailData>(`/portal/me/shipments/${id}`)
       .then(setShipment)
-      .catch(() => navigate(`/${slug}/dashboard`))
+      .catch(() => navigate("/dashboard"))
       .finally(() => setLoading(false));
-  }, [slug, id, navigate]);
+  }, [id, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-white/10 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to={`/${slug}/dashboard`} className="text-gray-400 hover:text-white transition">
+          <Link to="/dashboard" className="text-gray-400 hover:text-white transition">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           {branding?.logo ? (
@@ -78,7 +80,7 @@ export default function ShipmentDetail() {
         ) : shipment ? (
           <>
             <div className="rounded-2xl bg-gray-900 border border-white/10 p-5 space-y-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Número de tracking</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Numero de tracking</p>
               <p className="text-2xl font-mono font-bold">{shipment.trackingNumber}</p>
               {shipment.reference && <p className="text-sm text-gray-400">{shipment.reference}</p>}
               <span
@@ -94,15 +96,13 @@ export default function ShipmentDetail() {
                 Historial de eventos
               </h2>
               <div className="relative pl-6 space-y-0">
-                {/* Vertical line */}
                 <div className="absolute left-2 top-2 bottom-2 w-px bg-white/10" />
 
                 {shipment.events.length === 0 ? (
-                  <p className="text-sm text-gray-500">Sin eventos registrados aún</p>
+                  <p className="text-sm text-gray-500">Sin eventos registrados aun</p>
                 ) : (
                   shipment.events.map((ev, i) => (
                     <div key={i} className="relative pb-6 last:pb-0">
-                      {/* Dot */}
                       <div
                         className="absolute -left-[18px] mt-1 h-3 w-3 rounded-full border-2"
                         style={{

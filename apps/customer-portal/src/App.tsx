@@ -11,12 +11,11 @@ export default function App() {
     <BrowserRouter>
       <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
         <Routes>
-          <Route path="/:slug/login" element={<Login />} />
-          <Route path="/:slug/register" element={<Register />} />
-          <Route path="/:slug/dashboard" element={<Dashboard />} />
-          <Route path="/:slug/shipments/:id" element={<ShipmentDetail />} />
-          <Route path="/:slug" element={<Navigate to="login" replace />} />
-          <Route path="/" element={<div className="min-h-screen bg-gray-950 flex items-center justify-center text-white text-sm opacity-40">portal.syspaq.com</div>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/shipments/:id" element={<ShipmentDetail />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

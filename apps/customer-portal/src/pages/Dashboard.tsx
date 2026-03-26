@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Package, FileText, LogOut, ChevronRight, Box } from "lucide-react";
 import { api } from "@/lib/api";
 import { clearSession, getCustomer, isAuthenticated } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
+import { useSlug } from "@/hooks/useSlug";
 import { formatDate } from "@syspaq/ui";
 
 const PHASE_LABELS: Record<string, string> = {
@@ -48,9 +49,9 @@ interface Invoice {
 }
 
 export default function Dashboard() {
-  const { slug } = useParams<{ slug: string }>();
+  const slug = useSlug();
   const navigate = useNavigate();
-  const { branding } = useBranding(slug!);
+  const { branding } = useBranding(slug);
   const customer = getCustomer();
 
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -62,7 +63,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate(`/${slug}/login`, { replace: true });
+      navigate("/login", { replace: true });
       return;
     }
     api.get<{ data: Shipment[] }>("/portal/me/shipments")
@@ -77,7 +78,7 @@ export default function Dashboard() {
 
   function handleLogout() {
     clearSession();
-    navigate(`/${slug}/login`);
+    navigate("/login");
   }
 
   return (
@@ -158,7 +159,7 @@ export default function Dashboard() {
               shipments.map((s) => (
                 <Link
                   key={s.id}
-                  to={`/${slug}/shipments/${s.id}`}
+                  to={`/shipments/${s.id}`}
                   className="flex items-center justify-between rounded-xl bg-gray-900 border border-white/8 p-4 hover:border-white/20 transition"
                 >
                   <div className="space-y-1">

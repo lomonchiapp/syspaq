@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api";
 import { setSession } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
+import { useSlug } from "@/hooks/useSlug";
 
 const ID_TYPE_OPTIONS = [
   { value: "", label: "Seleccionar..." },
@@ -14,9 +15,9 @@ const ID_TYPE_OPTIONS = [
 ];
 
 export default function Register() {
-  const { slug } = useParams<{ slug: string }>();
+  const slug = useSlug();
   const navigate = useNavigate();
-  const { branding, loading: brandingLoading } = useBranding(slug!);
+  const { branding, loading: brandingLoading } = useBranding(slug);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -77,7 +78,7 @@ export default function Register() {
       }>(`/portal/${slug}/auth/register`, payload);
 
       setSession(res.access_token, res.customer);
-      navigate(`/${slug}/dashboard`);
+      navigate("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al crear la cuenta");
     } finally {
@@ -101,7 +102,6 @@ export default function Register() {
 
       <div className="relative z-10 w-full max-w-md mx-4">
         <div className="rounded-2xl bg-gray-900/90 backdrop-blur-sm border border-white/10 p-8 shadow-2xl">
-          {/* Logo */}
           <div className="flex justify-center mb-4">
             {branding?.logo ? (
               <img src={branding.logo} alt={branding.companyName} className="h-12 object-contain" />
@@ -116,7 +116,6 @@ export default function Register() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            {/* Name row */}
             <div className="grid grid-cols-2 gap-3">
               <input
                 type="text"
@@ -148,7 +147,6 @@ export default function Register() {
               style={{ "--tw-ring-color": primary } as React.CSSProperties}
             />
 
-            {/* Password */}
             <div className="relative">
               <input
                 type={showPw ? "text" : "password"}
@@ -178,7 +176,6 @@ export default function Register() {
               style={{ "--tw-ring-color": primary } as React.CSSProperties}
             />
 
-            {/* ID document */}
             <div className="grid grid-cols-2 gap-3">
               <select
                 value={form.idType}
@@ -202,7 +199,6 @@ export default function Register() {
               />
             </div>
 
-            {/* Branch selection */}
             <div>
               <label className="block text-xs text-gray-400 mb-1.5">
                 Sucursal de retiro
@@ -241,11 +237,7 @@ export default function Register() {
 
           <p className="text-center text-sm text-gray-400 mt-5">
             Ya tienes cuenta?{" "}
-            <Link
-              to={`/${slug}/login`}
-              className="font-medium hover:underline"
-              style={{ color: primary }}
-            >
+            <Link to="/login" className="font-medium hover:underline" style={{ color: primary }}>
               Iniciar Sesion
             </Link>
           </p>

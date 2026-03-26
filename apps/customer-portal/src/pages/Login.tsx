@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api";
 import { setSession } from "@/lib/store";
 import { useBranding } from "@/hooks/useBranding";
+import { useSlug } from "@/hooks/useSlug";
 
 export default function Login() {
-  const { slug } = useParams<{ slug: string }>();
+  const slug = useSlug();
   const navigate = useNavigate();
-  const { branding, loading: brandingLoading } = useBranding(slug!);
+  const { branding, loading: brandingLoading } = useBranding(slug);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,9 +30,9 @@ export default function Login() {
       }>(`/portal/${slug}/auth/login`, { email, password });
 
       setSession(res.access_token, res.customer);
-      navigate(`/${slug}/dashboard`);
+      navigate("/dashboard");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      setError(err instanceof Error ? err.message : "Error al iniciar sesion");
     } finally {
       setSubmitting(false);
     }
@@ -46,13 +47,10 @@ export default function Login() {
       className="min-h-screen flex items-center justify-center bg-gray-900 bg-cover bg-center"
       style={branding?.bgImage ? { backgroundImage: `url(${branding.bgImage})` } : {}}
     >
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/55" />
 
-      {/* Card */}
       <div className="relative z-10 w-full max-w-sm mx-4">
         <div className="rounded-2xl bg-gray-900/90 backdrop-blur-sm border border-white/10 p-8 shadow-2xl">
-          {/* Logo */}
           <div className="flex justify-center mb-6">
             {branding?.logo ? (
               <img src={branding.logo} alt={branding.companyName} className="h-12 object-contain" />
@@ -71,7 +69,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="Correo electrónico"
+              placeholder="Correo electronico"
               className="w-full rounded-lg bg-white/10 border border-white/15 px-4 py-2.5 text-white placeholder:text-gray-400 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition"
               style={{ "--tw-ring-color": primary } as React.CSSProperties}
             />
@@ -82,7 +80,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Contraseña"
+                placeholder="Contrasena"
                 className="w-full rounded-lg bg-white/10 border border-white/15 px-4 py-2.5 pr-10 text-white placeholder:text-gray-400 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition"
                 style={{ "--tw-ring-color": primary } as React.CSSProperties}
               />
@@ -105,19 +103,15 @@ export default function Login() {
               className="w-full py-2.5 rounded-lg text-white font-semibold text-sm transition hover:opacity-90 disabled:opacity-60"
               style={{ backgroundColor: primary }}
             >
-              {submitting ? "Entrando..." : "Iniciar Sesión"}
+              {submitting ? "Entrando..." : "Iniciar Sesion"}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-400 mt-5">
             No tienes cuenta?{" "}
-            <a
-              href={`/${slug}/register`}
-              className="font-medium hover:underline"
-              style={{ color: primary }}
-            >
+            <Link to="/register" className="font-medium hover:underline" style={{ color: primary }}>
               Registrate
-            </a>
+            </Link>
           </p>
 
           <p className="text-center text-[11px] text-gray-600 mt-5">
