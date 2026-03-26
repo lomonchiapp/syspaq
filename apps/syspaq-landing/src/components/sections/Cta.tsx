@@ -1,34 +1,9 @@
-import { useState } from "react";
-import { MonitorPlay, Copy, Check, Rocket, ArrowRight } from "lucide-react";
+import { MonitorPlay, Rocket, ArrowRight, Check, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 
-const DEMO_CREDENTIALS = {
-  tenant: "demo",
-  email: "admin@syspaq-demo.com",
-  password: "demo1234",
-};
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  function handleCopy() {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="ml-2 inline-flex items-center rounded p-1 text-surface-400 hover:text-primary-400 transition-colors"
-      title="Copiar"
-    >
-      {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-    </button>
-  );
-}
+const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || "";
 
 export function Cta() {
   return (
@@ -50,7 +25,7 @@ export function Cta() {
               <span className="text-primary-400">hoy</span>
             </h2>
             <p className="mt-4 text-lg text-surface-400">
-              Prueba el dashboard con datos reales o solicita una demo personalizada.
+              Explora la plataforma en vivo o crea tu cuenta y empieza a operar en minutos.
             </p>
           </motion.div>
 
@@ -61,7 +36,7 @@ export function Cta() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="rounded-xl border border-primary-500/30 bg-primary-500/5 p-6 sm:p-8"
+              className="rounded-xl border border-primary-500/30 bg-primary-500/5 p-6 sm:p-8 flex flex-col"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-500/20">
@@ -69,42 +44,39 @@ export function Cta() {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold">Probar Demo</h3>
-                  <p className="text-xs text-surface-400">Acceso inmediato, sin registro</p>
+                  <p className="text-xs text-surface-400">Acceso instantaneo, sin registro</p>
                 </div>
               </div>
 
-              <p className="mt-4 text-sm text-surface-300">
-                Explora el dashboard con datos de ejemplo: clientes, envíos, aduanas, facturas y más.
+              <p className="mt-4 text-sm text-surface-300 leading-relaxed">
+                Accede directamente al dashboard con datos reales de ejemplo: clientes, envios,
+                contenedores, aduanas, facturas y mas. Sin formularios, sin esperas.
               </p>
 
-              <div className="mt-6 space-y-3">
-                <div className="rounded-lg bg-surface-900/80 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-surface-500">Empresa</span>
-                    <CopyButton text={DEMO_CREDENTIALS.tenant} />
-                  </div>
-                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.tenant}</code>
-                </div>
-                <div className="rounded-lg bg-surface-900/80 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-surface-500">Correo</span>
-                    <CopyButton text={DEMO_CREDENTIALS.email} />
-                  </div>
-                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.email}</code>
-                </div>
-                <div className="rounded-lg bg-surface-900/80 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-surface-500">Contraseña</span>
-                    <CopyButton text={DEMO_CREDENTIALS.password} />
-                  </div>
-                  <code className="mt-1 block text-sm text-primary-300 font-mono">{DEMO_CREDENTIALS.password}</code>
-                </div>
-              </div>
+              <ul className="mt-6 space-y-2.5">
+                {[
+                  "Dashboard completo con datos de ejemplo",
+                  "Clientes, envios y tracking en vivo",
+                  "Facturacion, pagos y reportes",
+                  "Totalmente interactivo y funcional",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-surface-300">
+                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
 
-              <Button variant="accent" href={import.meta.env.VITE_DASHBOARD_URL || "/dashboard"} className="mt-6 w-full">
-                <MonitorPlay className="h-4 w-4" />
-                Abrir Dashboard Demo
-              </Button>
+              <div className="mt-auto pt-6">
+                <Button
+                  variant="accent"
+                  href={`${DASHBOARD_URL}/demo`}
+                  className="w-full"
+                >
+                  <MonitorPlay className="h-4 w-4" />
+                  Explorar Demo Ahora
+                </Button>
+              </div>
             </motion.div>
 
             {/* Signup CTA card */}
@@ -121,19 +93,20 @@ export function Cta() {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold">Crear mi cuenta</h3>
-                  <p className="text-xs text-surface-400">14 días gratis — sin tarjeta</p>
+                  <p className="text-xs text-surface-400">14 dias gratis — sin tarjeta</p>
                 </div>
               </div>
 
-              <p className="mt-4 text-sm text-surface-300">
-                Crea tu tenant en segundos. Recibes acceso al dashboard completo y tu primera API key para empezar a integrar.
+              <p className="mt-4 text-sm text-surface-300 leading-relaxed">
+                Crea tu tenant en segundos. Recibes acceso al dashboard completo y tu primera
+                API key para empezar a integrar.
               </p>
 
               <ul className="mt-6 space-y-2.5">
                 {[
                   "Tenant + usuario admin + API key",
-                  "Hasta 100 envíos de prueba",
-                  "Documentación API incluida",
+                  "Hasta 100 envios de prueba",
+                  "Documentacion API incluida",
                   "Sin contrato, cancela cuando quieras",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm text-surface-300">
@@ -143,10 +116,10 @@ export function Cta() {
                 ))}
               </ul>
 
-              <div className="mt-8 flex flex-col gap-3">
+              <div className="mt-auto pt-6 flex flex-col gap-3">
                 <Button
                   variant="accent"
-                  href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`}
+                  href={`${DASHBOARD_URL}/register`}
                   className="w-full"
                 >
                   <Rocket className="h-4 w-4" />
@@ -156,7 +129,7 @@ export function Cta() {
                   href="#contacto-demo"
                   className="flex items-center justify-center gap-1.5 text-sm text-surface-400 hover:text-surface-200 transition-colors"
                 >
-                  ¿Necesitas una demo personalizada?
+                  Necesitas una demo personalizada?
                   <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>

@@ -1,44 +1,112 @@
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChevronDown, BookOpen, Code2, Webhook, Rocket, FileText, HelpCircle, Package } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  BookOpen,
+  Rocket,
+  Package,
+  Truck,
+  BarChart3,
+  CreditCard,
+  Globe,
+  ShieldCheck,
+  Headphones,
+  MessageSquare,
+  FileText,
+  GraduationCap,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@syspaq/ui";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 
-const DOCS_MENU = [
-  {
-    group: "Primeros Pasos",
-    items: [
-      { icon: Rocket, label: "Guía de inicio rápido", desc: "Crea tu cuenta y configura tu primer envío", href: "https://api.syspaq.com/docs#/auth" },
-      { icon: BookOpen, label: "Conceptos básicos", desc: "Tenants, casilleros, fases de envío y más", href: "https://api.syspaq.com/docs" },
-    ],
+/* ------------------------------------------------------------------ */
+/*  Mega-menu data: Producto                                           */
+/* ------------------------------------------------------------------ */
+
+const PRODUCT_MENU = {
+  featured: {
+    title: "Plataforma SysPaq",
+    desc: "Todo lo que tu courier necesita para operar, facturar y crecer en una sola plataforma.",
+    cta: { label: "Ver todas las funciones", href: "#funciones" },
   },
-  {
-    group: "Referencia API",
-    items: [
-      { icon: Code2, label: "REST API", desc: "Documentación completa de todos los endpoints", href: "https://api.syspaq.com/docs" },
-      { icon: Webhook, label: "Webhooks", desc: "Recibe eventos en tiempo real en tu sistema", href: "https://api.syspaq.com/docs#/webhooks" },
-      { icon: Package, label: "E-commerce", desc: "Integra Shopify, WooCommerce y más", href: "https://api.syspaq.com/docs#/ecommerce" },
-    ],
+  columns: [
+    {
+      group: "Operaciones",
+      items: [
+        { icon: Package, label: "Envios & Tracking", desc: "9 fases de seguimiento en tiempo real", href: "#funciones" },
+        { icon: Truck, label: "Ultima Milla", desc: "Ordenes de entrega y logistica local", href: "#funciones" },
+        { icon: Globe, label: "Contenedores", desc: "Consolidacion maritima y aerea", href: "#funciones" },
+        { icon: ShieldCheck, label: "Aduanas & DGA", desc: "Etiquetas, despacho y compliance", href: "#funciones" },
+      ],
+    },
+    {
+      group: "Negocio",
+      items: [
+        { icon: CreditCard, label: "Facturacion & Pagos", desc: "Stripe, PayPal y cobros automaticos", href: "#funciones" },
+        { icon: BarChart3, label: "Analytics", desc: "KPIs, reportes y metricas en vivo", href: "#funciones" },
+        { icon: Zap, label: "E-commerce", desc: "Shopify, WooCommerce y mas", href: "#funciones" },
+        { icon: Globe, label: "Portal de Clientes", desc: "Self-service white-label", href: "#funciones" },
+      ],
+    },
+  ],
+};
+
+/* ------------------------------------------------------------------ */
+/*  Mega-menu data: Recursos                                           */
+/* ------------------------------------------------------------------ */
+
+const RESOURCES_MENU = {
+  columns: [
+    {
+      group: "Aprende",
+      items: [
+        { icon: Rocket, label: "Guia de Inicio", desc: "Configura tu cuenta en minutos", href: "#guia" },
+        { icon: BookOpen, label: "Centro de Ayuda", desc: "Tutoriales paso a paso", href: "#guia" },
+        { icon: GraduationCap, label: "Casos de Uso", desc: "Como otros couriers usan SysPaq", href: "#como-funciona" },
+        { icon: FileText, label: "Blog", desc: "Noticias, tips y mejores practicas", href: "#" },
+      ],
+    },
+    {
+      group: "Soporte",
+      items: [
+        { icon: Headphones, label: "Soporte Prioritario", desc: "Asistencia directa por chat y email", href: "#contacto" },
+        { icon: MessageSquare, label: "Comunidad", desc: "Conecta con otros operadores courier", href: "#contacto" },
+        { icon: FileText, label: "FAQ", desc: "Respuestas a preguntas frecuentes", href: "#faq" },
+        { icon: Zap, label: "Status del Servicio", desc: "Disponibilidad y uptime en vivo", href: "#" },
+      ],
+    },
+  ],
+  highlight: {
+    title: "Prueba gratis por 14 dias",
+    desc: "Sin tarjeta de credito. Configura tu operacion y prueba con datos reales.",
+    cta: { label: "Comenzar ahora", href: "#contacto" },
   },
-  {
-    group: "Recursos",
-    items: [
-      { icon: FileText, label: "OpenAPI / Swagger", desc: "Descarga el spec y genera tu cliente SDK", href: "https://api.syspaq.com/openapi.json" },
-      { icon: HelpCircle, label: "FAQ técnico", desc: "Preguntas frecuentes de integradores", href: "#faq" },
-    ],
-  },
-];
+};
 
 const NAV_LINKS = [
-  { label: "Funciones", href: "#funciones" },
-  { label: "Cómo Funciona", href: "#como-funciona" },
+  { label: "Como Funciona", href: "#como-funciona" },
   { label: "Precios", href: "#precios" },
   { label: "FAQ", href: "#faq" },
   { label: "Contacto", href: "#contacto" },
 ];
 
-function DocsMenu() {
+/* ------------------------------------------------------------------ */
+/*  MegaMenu Component                                                 */
+/* ------------------------------------------------------------------ */
+
+function MegaMenu({
+  label,
+  children,
+  wide,
+}: {
+  label: string;
+  children: React.ReactNode;
+  wide?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -56,11 +124,16 @@ function DocsMenu() {
         onClick={() => setOpen(!open)}
         className={cn(
           "flex items-center gap-1 text-sm transition-colors",
-          open ? "text-white" : "text-surface-300 hover:text-white"
+          open ? "text-white" : "text-surface-300 hover:text-white",
         )}
       >
-        Guía & Docs
-        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", open && "rotate-180")} />
+        {label}
+        <ChevronDown
+          className={cn(
+            "h-3.5 w-3.5 transition-transform duration-200",
+            open && "rotate-180",
+          )}
+        />
       </button>
 
       <AnimatePresence>
@@ -70,64 +143,155 @@ function DocsMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18 }}
-            className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-[640px] rounded-2xl border border-surface-700/60 bg-surface-950/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+            className={cn(
+              "absolute left-1/2 -translate-x-1/2 top-full mt-3 rounded-2xl border border-surface-700/60 bg-surface-950/95 backdrop-blur-xl shadow-2xl overflow-hidden",
+              wide ? "w-[780px]" : "w-[680px]",
+            )}
+            onClick={() => setOpen(false)}
           >
-            {/* Header strip */}
-            <div className="border-b border-surface-700/40 px-6 py-3 flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-surface-500">Documentación & Guías</span>
-              <a
-                href="https://api.syspaq.com/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary-400 hover:text-primary-300 transition-colors"
-              >
-                Ver docs completos →
-              </a>
-            </div>
-
-            <div className="grid grid-cols-3 gap-0 p-2">
-              {DOCS_MENU.map((section) => (
-                <div key={section.group} className="p-3">
-                  <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-surface-600">
-                    {section.group}
-                  </p>
-                  <div className="space-y-0.5">
-                    {section.items.map((item) => (
-                      <a
-                        key={item.label}
-                        href={item.href}
-                        target={item.href.startsWith("http") ? "_blank" : undefined}
-                        rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                        onClick={() => setOpen(false)}
-                        className="flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-surface-800/70 group"
-                      >
-                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-400 group-hover:bg-primary-500/20 transition-colors">
-                          <item.icon className="h-3.5 w-3.5" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-surface-200 group-hover:text-white transition-colors">
-                            {item.label}
-                          </p>
-                          <p className="text-xs text-surface-500 leading-snug mt-0.5">{item.desc}</p>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Footer strip */}
-            <div className="border-t border-surface-700/40 px-6 py-3 bg-surface-900/50 flex items-center gap-2">
-              <span className="text-xs text-surface-500">API base URL:</span>
-              <code className="text-xs font-mono text-primary-400">https://api.syspaq.com/v1</code>
-            </div>
+            {children}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  ProductMegaMenu                                                    */
+/* ------------------------------------------------------------------ */
+
+function ProductMegaMenu() {
+  return (
+    <MegaMenu label="Producto" wide>
+      <div className="flex">
+        {/* Featured left panel */}
+        <div className="w-[240px] shrink-0 border-r border-surface-700/40 bg-gradient-to-b from-primary-500/5 to-transparent p-6 flex flex-col justify-between">
+          <div>
+            <p className="font-display text-sm font-bold text-white">
+              {PRODUCT_MENU.featured.title}
+            </p>
+            <p className="mt-2 text-xs text-surface-400 leading-relaxed">
+              {PRODUCT_MENU.featured.desc}
+            </p>
+          </div>
+          <a
+            href={PRODUCT_MENU.featured.cta.href}
+            className="mt-6 inline-flex items-center gap-1.5 text-xs font-semibold text-primary-400 hover:text-primary-300 transition-colors"
+          >
+            {PRODUCT_MENU.featured.cta.label}
+            <ArrowRight className="h-3 w-3" />
+          </a>
+        </div>
+
+        {/* Columns */}
+        <div className="grid grid-cols-2 flex-1 gap-0 p-2">
+          {PRODUCT_MENU.columns.map((col) => (
+            <div key={col.group} className="p-3">
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-surface-600">
+                {col.group}
+              </p>
+              <div className="space-y-0.5">
+                {col.items.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-surface-800/70 group"
+                  >
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-400 group-hover:bg-primary-500/20 transition-colors">
+                      <item.icon className="h-3.5 w-3.5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 group-hover:text-white transition-colors">
+                        {item.label}
+                      </p>
+                      <p className="text-xs text-surface-500 leading-snug mt-0.5">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </MegaMenu>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  ResourcesMegaMenu                                                  */
+/* ------------------------------------------------------------------ */
+
+function ResourcesMegaMenu() {
+  return (
+    <MegaMenu label="Recursos">
+      <div className="flex">
+        {/* Columns */}
+        <div className="grid grid-cols-2 flex-1 gap-0 p-2">
+          {RESOURCES_MENU.columns.map((col) => (
+            <div key={col.group} className="p-3">
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-surface-600">
+                {col.group}
+              </p>
+              <div className="space-y-0.5">
+                {col.items.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-surface-800/70 group"
+                  >
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 group-hover:bg-accent-500/20 transition-colors">
+                      <item.icon className="h-3.5 w-3.5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 group-hover:text-white transition-colors">
+                        {item.label}
+                      </p>
+                      <p className="text-xs text-surface-500 leading-snug mt-0.5">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Highlight right panel */}
+        <div className="w-[200px] shrink-0 border-l border-surface-700/40 bg-gradient-to-b from-accent-500/5 to-transparent p-5 flex flex-col justify-between">
+          <div>
+            <p className="font-display text-sm font-bold text-white">
+              {RESOURCES_MENU.highlight.title}
+            </p>
+            <p className="mt-2 text-xs text-surface-400 leading-relaxed">
+              {RESOURCES_MENU.highlight.desc}
+            </p>
+          </div>
+          <a
+            href={RESOURCES_MENU.highlight.cta.href}
+            className="mt-4 inline-flex items-center justify-center rounded-lg bg-accent-500 px-4 py-2 text-xs font-semibold text-surface-950 hover:bg-accent-400 transition-colors"
+          >
+            {RESOURCES_MENU.highlight.cta.label}
+          </a>
+        </div>
+      </div>
+    </MegaMenu>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Mobile menu helper: flatten all mega-menu items                    */
+/* ------------------------------------------------------------------ */
+
+const MOBILE_PRODUCT_ITEMS = PRODUCT_MENU.columns.flatMap((c) => c.items);
+const MOBILE_RESOURCE_ITEMS = RESOURCES_MENU.columns.flatMap((c) => c.items);
+
+/* ------------------------------------------------------------------ */
+/*  Navbar                                                             */
+/* ------------------------------------------------------------------ */
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -155,7 +319,8 @@ export function Navbar() {
         </a>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-7 md:flex">
+          <ProductMegaMenu />
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -165,7 +330,7 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <DocsMenu />
+          <ResourcesMegaMenu />
         </nav>
 
         {/* Desktop CTA */}
@@ -174,9 +339,13 @@ export function Navbar() {
             href={import.meta.env.VITE_DASHBOARD_URL || "/dashboard"}
             className="text-sm text-surface-300 transition-colors hover:text-white"
           >
-            Iniciar Sesión
+            Iniciar Sesion
           </a>
-          <Button variant="accent" href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`} className="text-xs px-4 py-2">
+          <Button
+            variant="accent"
+            href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`}
+            className="text-xs px-4 py-2"
+          >
             Prueba Gratis
           </Button>
         </div>
@@ -200,28 +369,15 @@ export function Navbar() {
             className="overflow-hidden border-b border-surface-700/50 bg-surface-950/95 backdrop-blur-xl md:hidden"
           >
             <Container className="flex flex-col gap-4 py-6">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-sm text-surface-300 transition-colors hover:text-white"
-                >
-                  {link.label}
-                </a>
-              ))}
-
-              {/* Docs section in mobile */}
-              <div className="border-t border-surface-700/40 pt-4">
+              {/* Product section */}
+              <div>
                 <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-surface-600">
-                  Guía & Docs
+                  Producto
                 </p>
-                {DOCS_MENU.flatMap((s) => s.items).map((item) => (
+                {MOBILE_PRODUCT_ITEMS.map((item) => (
                   <a
                     key={item.label}
                     href={item.href}
-                    target={item.href.startsWith("http") ? "_blank" : undefined}
-                    rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 py-2 text-sm text-surface-300 hover:text-white transition-colors"
                   >
@@ -231,11 +387,50 @@ export function Navbar() {
                 ))}
               </div>
 
+              {/* Nav links */}
+              <div className="border-t border-surface-700/40 pt-4">
+                {NAV_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-2 text-sm text-surface-300 transition-colors hover:text-white"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+
+              {/* Resources section */}
+              <div className="border-t border-surface-700/40 pt-4">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-surface-600">
+                  Recursos & Soporte
+                </p>
+                {MOBILE_RESOURCE_ITEMS.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 py-2 text-sm text-surface-300 hover:text-white transition-colors"
+                  >
+                    <item.icon className="h-4 w-4 text-accent-400 shrink-0" />
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+
               <div className="flex flex-col gap-3 pt-4 border-t border-surface-700/50">
-                <a href={import.meta.env.VITE_DASHBOARD_URL || "/dashboard"} className="text-sm text-surface-300">
-                  Iniciar Sesión
+                <a
+                  href={import.meta.env.VITE_DASHBOARD_URL || "/dashboard"}
+                  className="text-sm text-surface-300"
+                >
+                  Iniciar Sesion
                 </a>
-                <Button variant="accent" href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`} className="text-xs">
+                <Button
+                  variant="accent"
+                  href={`${import.meta.env.VITE_DASHBOARD_URL || ""}/register`}
+                  className="text-xs"
+                >
                   Prueba Gratis
                 </Button>
               </div>
