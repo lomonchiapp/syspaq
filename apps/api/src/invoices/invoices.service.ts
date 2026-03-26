@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InvoiceStatus, Prisma } from "@prisma/client";
 import { PrismaService } from "@/prisma/prisma.service";
 import { CreateInvoiceDto, CreateInvoiceItemDto } from "./dto/create-invoice.dto";
@@ -17,7 +18,10 @@ interface ReceptionCharge {
 
 @Injectable()
 export class InvoicesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   /* ------------------------------------------------------------------ */
   /*  Helpers                                                            */
@@ -353,7 +357,7 @@ export class InvoicesService {
     const dueAt = new Date(issuedAt);
     dueAt.setDate(dueAt.getDate() + invoice.paymentTermDays);
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // Link receptions that have items on this invoice
       const receptionIds = invoice.items
         .map((i) => i.receptionId)
@@ -376,6 +380,10 @@ export class InvoicesService {
         include: { items: true },
       });
     });
+
+    this.eventEmitter.emit('invoice.issued', { tenantId, invoiceId: id });
+
+    return result;
   }
 
   async cancel(tenantId: string, id: string) {

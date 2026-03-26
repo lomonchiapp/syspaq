@@ -31,6 +31,10 @@ import { SettingsModule } from "./settings/settings.module";
 import { AdminModule } from "./admin/admin.module";
 import { PortalModule } from "./portal/portal.module";
 import { CajaChicaModule } from "./caja-chica/caja-chica.module";
+import { FiscalModule } from "./fiscal/fiscal.module";
+import { FleetModule } from "./fleet/fleet.module";
+import { TicketsModule } from "./tickets/tickets.module";
+import { MobileModule } from "./mobile/mobile.module";
 import { AuditModule } from "./common/audit/audit.module";
 import { ProblemJsonExceptionFilter } from "./common/filters/problem-json.filter";
 import { RequestLoggerMiddleware } from "./common/middleware/request-logger.middleware";
@@ -73,6 +77,10 @@ import { RequestLoggerMiddleware } from "./common/middleware/request-logger.midd
     AdminModule,
     PortalModule,
     CajaChicaModule,
+    FiscalModule,
+    FleetModule,
+    TicketsModule,
+    MobileModule,
     HealthModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ProblemJsonExceptionFilter }],

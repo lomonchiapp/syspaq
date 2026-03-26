@@ -52,6 +52,13 @@ model Tenant {
   billingRecords        BillingRecord[]
   cajaChicaSessions     CajaChicaSession[]
   cajaChicaTransactions CajaChicaTransaction[]
+  drivers               Driver[]
+  vehicles              Vehicle[]
+  routes                Route[]
+  fiscalSequences       FiscalSequence[]
+  fiscalReports         FiscalReport[]
+  tickets               Ticket[]
+  driverSessions        DriverSession[]
 }
 
 model ApiKey {
@@ -238,6 +245,7 @@ model Customer {
   invoices        Invoice[]
   payments        Payment[]
   deliveryOrders  DeliveryOrder[]
+  tickets         Ticket[]
 
   @@unique([tenantId, casillero])
   @@unique([tenantId, email])
@@ -276,6 +284,8 @@ model Branch {
   payments              Payment[]
   cajaChicaSessions     CajaChicaSession[]
   cajaChicaTransactions CajaChicaTransaction[]
+  vehicles              Vehicle[]
+  routes                Route[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -669,6 +679,9 @@ model DeliveryOrder {
   shipmentId      String              @map("shipment_id")
   customerId      String?             @map("customer_id")
   number          String                                  // DO-00001
+  driverId        String?             @map("driver_id")
+  vehicleId       String?             @map("vehicle_id")
+  routeId         String?             @map("route_id")
   driverName      String?             @map("driver_name")
   driverPhone     String?             @map("driver_phone")
   driverVehicle   String?             @map("driver_vehicle")
@@ -690,14 +703,19 @@ model DeliveryOrder {
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
 
-  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  shipment Shipment  @relation(fields: [shipmentId], references: [id])
-  customer Customer? @relation(fields: [customerId], references: [id])
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  shipment   Shipment  @relation(fields: [shipmentId], references: [id])
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  driver     Driver?   @relation(fields: [driverId], references: [id])
+  vehicle    Vehicle?  @relation(fields: [vehicleId], references: [id])
+  route      Route?    @relation(fields: [routeId], references: [id])
+  routeStops RouteStop[]
 
   @@unique([tenantId, number])
   @@index([tenantId, status])
   @@index([tenantId, customerId])
   @@index([tenantId, scheduledAt])
+  @@index([tenantId, driverId])
   @@map("delivery_orders")
 }
 
@@ -1065,4 +1083,331 @@ model CajaChicaTransaction {
   @@index([tenantId, branchId, createdAt])
   @@index([paymentId])
   @@map("caja_chica_transactions")
+}
+
+// ─── Fleet & Routes ───
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  VAN
+  TRUCK
+  CAR
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  RETIRED
+}
+
+enum RouteStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RouteStopStatus {
+  PENDING
+  ARRIVED
+  COMPLETED
+  SKIPPED
+}
+
+model Driver {
+  id             String       @id @default(uuid())
+  tenantId       String       @map("tenant_id")
+  firstName      String       @map("first_name")
+  lastName       String       @map("last_name")
+  phone          String
+  email          String?
+  pinHash        String?      @map("pin_hash")
+  licenseNumber  String?      @map("license_number")
+  licenseType    String?      @map("license_type")
+  status         DriverStatus @default(ACTIVE)
+  vehicleId      String?      @map("vehicle_id")
+  avatar         String?
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vehicle        Vehicle?        @relation(fields: [vehicleId], references: [id])
+  deliveryOrders DeliveryOrder[]
+  routes         Route[]
+  sessions       DriverSession[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, phone])
+  @@map("drivers")
+}
+
+model Vehicle {
+  id                 String        @id @default(uuid())
+  tenantId           String        @map("tenant_id")
+  plate              String
+  brand              String
+  model              String
+  year               Int?
+  type               VehicleType   @default(VAN)
+  capacityWeightLbs  Decimal?      @map("capacity_weight_lbs") @db.Decimal(8, 2)
+  capacityVolumeCbft Decimal?      @map("capacity_volume_cbft") @db.Decimal(8, 2)
+  status             VehicleStatus @default(AVAILABLE)
+  currentBranchId    String?       @map("current_branch_id")
+  mileage            Int?
+  lastServiceAt      DateTime?     @map("last_service_at")
+  fuelType           String?       @map("fuel_type")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  currentBranch  Branch?         @relation(fields: [currentBranchId], references: [id])
+  drivers        Driver[]
+  deliveryOrders DeliveryOrder[]
+  routes         Route[]
+
+  @@unique([tenantId, plate])
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@map("vehicles")
+}
+
+model Route {
+  id             String      @id @default(uuid())
+  tenantId       String      @map("tenant_id")
+  number         String
+  driverId       String      @map("driver_id")
+  vehicleId      String?     @map("vehicle_id")
+  branchId       String      @map("branch_id")
+  status         RouteStatus @default(PLANNED)
+  plannedDate    DateTime    @map("planned_date")
+  startedAt      DateTime?   @map("started_at")
+  completedAt    DateTime?   @map("completed_at")
+  totalStops     Int         @default(0) @map("total_stops")
+  completedStops Int         @default(0) @map("completed_stops")
+  totalDistance   Decimal?   @map("total_distance") @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  driver         Driver          @relation(fields: [driverId], references: [id])
+  vehicle        Vehicle?        @relation(fields: [vehicleId], references: [id])
+  branch         Branch          @relation(fields: [branchId], references: [id])
+  stops          RouteStop[]
+  deliveryOrders DeliveryOrder[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+  @@index([tenantId, plannedDate])
+  @@map("routes")
+}
+
+model RouteStop {
+  id               String          @id @default(uuid())
+  routeId          String          @map("route_id")
+  deliveryOrderId  String          @map("delivery_order_id")
+  sequence         Int
+  status           RouteStopStatus @default(PENDING)
+  estimatedArrival DateTime?       @map("estimated_arrival")
+  actualArrival    DateTime?       @map("actual_arrival")
+  actualDeparture  DateTime?       @map("actual_departure")
+  notes            String?
+  createdAt        DateTime        @default(now()) @map("created_at")
+
+  route         Route         @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  deliveryOrder DeliveryOrder @relation(fields: [deliveryOrderId], references: [id])
+
+  @@index([routeId, sequence])
+  @@map("route_stops")
+}
+
+// ─── Fiscal Compliance (RD) ───
+
+enum FiscalSequenceType {
+  B01
+  B02
+  B04
+  B14
+  B15
+}
+
+enum FiscalReportType {
+  REPORT_606
+  REPORT_607
+  REPORT_IT1
+}
+
+enum FiscalReportStatus {
+  DRAFT
+  GENERATED
+  SUBMITTED
+}
+
+model FiscalSequence {
+  id                  String             @id @default(uuid())
+  tenantId            String             @map("tenant_id")
+  type                FiscalSequenceType
+  prefix              String
+  currentNumber       Int                @default(0) @map("current_number")
+  authorizationNumber String?            @map("authorization_number")
+  validFrom           DateTime           @map("valid_from")
+  validUntil          DateTime           @map("valid_until")
+  isActive            Boolean            @default(true) @map("is_active")
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, type, isActive])
+  @@map("fiscal_sequences")
+}
+
+model FiscalReport {
+  id          String             @id @default(uuid())
+  tenantId    String             @map("tenant_id")
+  type        FiscalReportType
+  period      String
+  status      FiscalReportStatus @default(DRAFT)
+  fileUrl     String?            @map("file_url")
+  generatedAt DateTime?          @map("generated_at")
+  submittedAt DateTime?          @map("submitted_at")
+  data        Json               @default("{}")
+  createdAt   DateTime           @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, type, period])
+  @@index([tenantId, type])
+  @@map("fiscal_reports")
+}
+
+// ─── Help Desk (Tickets) ───
+
+enum TicketCategory {
+  SHIPMENT_ISSUE
+  BILLING
+  DAMAGE
+  LOST_PACKAGE
+  GENERAL
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketCommentAuthorType {
+  OPERATOR
+  CUSTOMER
+  SYSTEM
+}
+
+model Ticket {
+  id           String         @id @default(uuid())
+  tenantId     String         @map("tenant_id")
+  number       String
+  customerId   String?        @map("customer_id")
+  subject      String
+  description  String         @db.Text
+  category     TicketCategory @default(GENERAL)
+  priority     TicketPriority @default(MEDIUM)
+  status       TicketStatus   @default(OPEN)
+  assignedToId String?        @map("assigned_to_id")
+  shipmentId   String?        @map("shipment_id")
+  invoiceId    String?        @map("invoice_id")
+  resolvedAt   DateTime?      @map("resolved_at")
+  closedAt     DateTime?      @map("closed_at")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  tenant   Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer?       @relation(fields: [customerId], references: [id])
+  comments TicketComment[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+  @@index([tenantId, customerId])
+  @@index([tenantId, assignedToId])
+  @@index([tenantId, priority])
+  @@map("tickets")
+}
+
+model TicketComment {
+  id          String                  @id @default(uuid())
+  ticketId    String                  @map("ticket_id")
+  authorType  TicketCommentAuthorType @map("author_type")
+  authorId    String                  @map("author_id")
+  authorName  String                  @map("author_name")
+  body        String                  @db.Text
+  isInternal  Boolean                 @default(false) @map("is_internal")
+  attachments Json                    @default("[]")
+  createdAt   DateTime                @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_comments")
+}
+
+// ─── Mobile Operations (Driver Sessions & GPS) ───
+
+enum DriverSessionStatus {
+  ACTIVE
+  ENDED
+}
+
+model DriverSession {
+  id             String              @id @default(uuid())
+  tenantId       String              @map("tenant_id")
+  driverId       String              @map("driver_id")
+  status         DriverSessionStatus @default(ACTIVE)
+  startedAt      DateTime            @default(now()) @map("started_at")
+  endedAt        DateTime?           @map("ended_at")
+  startLocation  Json?               @map("start_location")
+  lastLocation   Json?               @map("last_location")
+  lastLocationAt DateTime?           @map("last_location_at")
+  deviceInfo     Json?               @map("device_info")
+
+  tenant Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  driver Driver         @relation(fields: [driverId], references: [id])
+  pings  LocationPing[]
+
+  @@index([tenantId, driverId, status])
+  @@index([tenantId, status])
+  @@map("driver_sessions")
+}
+
+model LocationPing {
+  id         String   @id @default(uuid())
+  sessionId  String   @map("session_id")
+  lat        Decimal  @db.Decimal(10, 7)
+  lng        Decimal  @db.Decimal(10, 7)
+  accuracy   Decimal? @db.Decimal(6, 1)
+  speed      Decimal? @db.Decimal(6, 1)
+  heading    Decimal? @db.Decimal(5, 1)
+  recordedAt DateTime @map("recorded_at")
+
+  session DriverSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, recordedAt])
+  @@map("location_pings")
 }
