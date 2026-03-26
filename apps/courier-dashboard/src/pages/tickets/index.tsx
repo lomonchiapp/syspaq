@@ -196,7 +196,7 @@ export default function TicketsPage() {
           <KpiCard
             icon={<Timer className="h-5 w-5 text-amber-400" />}
             label="Tiempo Prom. Resolucion"
-            value={`${stats.avgResolutionHours.toFixed(1)}h`}
+            value={`${(stats.avgResolutionHours ?? 0).toFixed(1)}h`}
             color="amber"
           />
         </div>
