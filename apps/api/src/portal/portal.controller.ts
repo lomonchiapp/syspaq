@@ -1,0 +1,100 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Request } from "express";
+import { Public } from "@/common/decorators/public.decorator";
+import { PortalService } from "./portal.service";
+import { PortalLoginDto } from "./dto/portal-login.dto";
+import { CustomerJwtGuard } from "./guards/customer-jwt.guard";
+
+@ApiTags("portal")
+@Controller("portal")
+export class PortalController {
+  constructor(private readonly portal: PortalService) {}
+
+  // ── Public endpoints (no tenant auth) ──────────────────────────
+
+  @Public()
+  @Get(":slug/config")
+  @ApiOperation({ summary: "Get tenant portal branding (public)" })
+  getConfig(@Param("slug") slug: string) {
+    return this.portal.getConfig(slug);
+  }
+
+  @Public()
+  @Post(":slug/auth/login")
+  @ApiOperation({ summary: "Customer login for tenant portal" })
+  login(@Param("slug") slug: string, @Body() dto: PortalLoginDto) {
+    return this.portal.login(slug, dto);
+  }
+
+  @Public()
+  @Get(":slug/tracking/:trackingNumber")
+  @ApiOperation({ summary: "Public shipment tracking by number" })
+  publicTracking(
+    @Param("slug") slug: string,
+    @Param("trackingNumber") trackingNumber: string,
+  ) {
+    return this.portal.publicTracking(slug, trackingNumber);
+  }
+
+  // ── Protected customer endpoints ────────────────────────────────
+
+  @UseGuards(CustomerJwtGuard)
+  @Get("me")
+  @ApiOperation({ summary: "Get logged-in customer profile" })
+  getMe(@Req() req: Request) {
+    return this.portal.getMe(req.customer!.customerId, req.customer!.tenantId);
+  }
+
+  @UseGuards(CustomerJwtGuard)
+  @Get("me/shipments")
+  @ApiOperation({ summary: "List customer shipments" })
+  getShipments(
+    @Req() req: Request,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return this.portal.getShipments(
+      req.customer!.customerId,
+      req.customer!.tenantId,
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 20,
+    );
+  }
+
+  @UseGuards(CustomerJwtGuard)
+  @Get("me/shipments/:id")
+  @ApiOperation({ summary: "Get shipment with full tracking history" })
+  getShipmentTracking(@Req() req: Request, @Param("id") id: string) {
+    return this.portal.getShipmentTracking(
+      req.customer!.customerId,
+      req.customer!.tenantId,
+      id,
+    );
+  }
+
+  @UseGuards(CustomerJwtGuard)
+  @Get("me/invoices")
+  @ApiOperation({ summary: "List customer invoices" })
+  getInvoices(
+    @Req() req: Request,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return this.portal.getInvoices(
+      req.customer!.customerId,
+      req.customer!.tenantId,
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 20,
+    );
+  }
+}

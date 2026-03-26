@@ -531,15 +531,20 @@ export interface DeliveryOrderDetail {
 /* ------------------------------------------------------------------ */
 
 export interface TenantSettings {
-  tenantName!: string;
-  slug!: string;
-  casilleroPrefix!: string;
-  casilleroCounter!: number;
-  stripeConfigured!: boolean;
-  paypalConfigured!: boolean;
+  tenantName: string;
+  slug: string;
+  casilleroPrefix: string;
+  casilleroCounter: number;
+  stripeConfigured: boolean;
+  paypalConfigured: boolean;
   smtpHost?: string;
   smtpPort?: number;
   smtpUser?: string;
+  portalCompanyName?: string | null;
+  portalLogo?: string | null;
+  portalPrimaryColor?: string | null;
+  portalBgImage?: string | null;
+  portalWelcomeText?: string | null;
 }
 
 export interface ApiKeyItem {

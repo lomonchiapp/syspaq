@@ -20,6 +20,12 @@ model Tenant {
   periodStart      DateTime?  @map("period_start")
   periodEnd        DateTime?  @map("period_end")
   adminNotes       String?    @map("admin_notes")
+  // Customer portal branding
+  portalCompanyName  String?  @map("portal_company_name")
+  portalLogo         String?  @map("portal_logo")
+  portalPrimaryColor String?  @map("portal_primary_color")
+  portalBgImage      String?  @map("portal_bg_image")
+  portalWelcomeText  String?  @map("portal_welcome_text")
   createdAt        DateTime   @default(now()) @map("created_at")
   updatedAt        DateTime   @updatedAt @map("updated_at")
 

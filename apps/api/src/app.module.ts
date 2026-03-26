@@ -29,6 +29,7 @@ import { AnalyticsModule } from "./analytics/analytics.module";
 import { UsersModule } from "./users/users.module";
 import { SettingsModule } from "./settings/settings.module";
 import { AdminModule } from "./admin/admin.module";
+import { PortalModule } from "./portal/portal.module";
 import { AuditModule } from "./common/audit/audit.module";
 import { ProblemJsonExceptionFilter } from "./common/filters/problem-json.filter";
 import { RequestLoggerMiddleware } from "./common/middleware/request-logger.middleware";
@@ -69,6 +70,7 @@ import { RequestLoggerMiddleware } from "./common/middleware/request-logger.midd
     UsersModule,
     SettingsModule,
     AdminModule,
+    PortalModule,
     HealthModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ProblemJsonExceptionFilter }],

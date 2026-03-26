@@ -28,16 +28,35 @@ export class SettingsService {
       smtpHost: this.config.get<string>("smtp.host") || undefined,
       smtpPort: this.config.get<number>("smtp.port") || undefined,
       smtpUser: this.config.get<string>("smtp.user") || undefined,
+      // Portal branding
+      portalCompanyName: tenant.portalCompanyName ?? null,
+      portalLogo: tenant.portalLogo ?? null,
+      portalPrimaryColor: tenant.portalPrimaryColor ?? null,
+      portalBgImage: tenant.portalBgImage ?? null,
+      portalWelcomeText: tenant.portalWelcomeText ?? null,
     };
   }
 
   async updateTenantSettings(
     tenantId: string,
-    data: { tenantName?: string; casilleroPrefix?: string },
+    data: {
+      tenantName?: string;
+      casilleroPrefix?: string;
+      portalCompanyName?: string;
+      portalLogo?: string;
+      portalPrimaryColor?: string;
+      portalBgImage?: string;
+      portalWelcomeText?: string;
+    },
   ) {
     const update: Record<string, unknown> = {};
     if (data.tenantName) update.name = data.tenantName;
     if (data.casilleroPrefix) update.casilleroPrefix = data.casilleroPrefix;
+    if (data.portalCompanyName !== undefined) update.portalCompanyName = data.portalCompanyName;
+    if (data.portalLogo !== undefined) update.portalLogo = data.portalLogo;
+    if (data.portalPrimaryColor !== undefined) update.portalPrimaryColor = data.portalPrimaryColor;
+    if (data.portalBgImage !== undefined) update.portalBgImage = data.portalBgImage;
+    if (data.portalWelcomeText !== undefined) update.portalWelcomeText = data.portalWelcomeText;
 
     const tenant = await this.prisma.tenant.update({
       where: { id: tenantId },

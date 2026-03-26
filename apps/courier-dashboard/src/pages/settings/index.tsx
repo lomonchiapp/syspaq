@@ -12,6 +12,8 @@ import {
   Check,
   Eye,
   EyeOff,
+  Globe,
+  Save,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DetailCard } from "@/components/shared/detail-card";
@@ -20,7 +22,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Skeleton } from "@/components/shared/loading-skeleton";
 import { Dialog } from "@/components/ui/dialog";
 import { formatDateTime } from "@syspaq/ui";
-import { useTenantSettings, useApiKeys, useCreateApiKey, useRevokeApiKey } from "@/hooks/use-api";
+import { useTenantSettings, useUpdateTenantSettings, useApiKeys, useCreateApiKey, useRevokeApiKey } from "@/hooks/use-api";
 import type { ApiKeyItem } from "@/types/api";
 
 /* ------------------------------------------------------------------ */
@@ -157,10 +159,40 @@ export default function SettingsPage() {
   const { data: tenant, isLoading: tenantLoading } = useTenantSettings();
   const { data: apiKeys, isLoading: keysLoading } = useApiKeys();
   const revokeKey = useRevokeApiKey();
+  const updateSettings = useUpdateTenantSettings();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [newRawKey, setNewRawKey] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
+
+  // Portal branding form state
+  const [portalForm, setPortalForm] = useState({
+    portalCompanyName: "",
+    portalLogo: "",
+    portalPrimaryColor: "#01b9bf",
+    portalBgImage: "",
+    portalWelcomeText: "",
+  });
+  const [portalSaved, setPortalSaved] = useState(false);
+
+  // Sync form when tenant data loads
+  const [portalInitialized, setPortalInitialized] = useState(false);
+  if (tenant && !portalInitialized) {
+    setPortalForm({
+      portalCompanyName: tenant.portalCompanyName ?? "",
+      portalLogo: tenant.portalLogo ?? "",
+      portalPrimaryColor: tenant.portalPrimaryColor ?? "#01b9bf",
+      portalBgImage: tenant.portalBgImage ?? "",
+      portalWelcomeText: tenant.portalWelcomeText ?? "",
+    });
+    setPortalInitialized(true);
+  }
+
+  async function savePortalBranding() {
+    await updateSettings.mutateAsync(portalForm);
+    setPortalSaved(true);
+    setTimeout(() => setPortalSaved(false), 2500);
+  }
 
   const keyList = apiKeys ?? [];
 
@@ -330,6 +362,105 @@ export default function SettingsPage() {
             <p className="text-sm text-[var(--muted-foreground)]">
               No se pudo cargar la configuracion de pagos.
             </p>
+          )}
+        </DetailCard>
+
+        {/* Portal Branding */}
+        <DetailCard
+          title="Portal del Cliente"
+          icon={<Globe className="h-4 w-4" />}
+          actions={
+            <a
+              href={`${import.meta.env.VITE_PORTAL_URL || "https://portal.syspaq.com"}/${tenant?.slug ?? ""}/login`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[var(--primary)] hover:underline"
+            >
+              Ver portal →
+            </a>
+          }
+        >
+          {tenantLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Personaliza el portal que verán los titulares de casilleros al iniciar sesión.
+                URL: <code className="text-[var(--primary)]">{import.meta.env.VITE_PORTAL_URL || "https://portal.syspaq.com"}/{tenant?.slug}/login</code>
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className="block">
+                  <span className="text-xs font-medium text-[var(--muted-foreground)] mb-1 block">Nombre visible</span>
+                  <input
+                    type="text"
+                    value={portalForm.portalCompanyName}
+                    onChange={(e) => setPortalForm((f) => ({ ...f, portalCompanyName: e.target.value }))}
+                    placeholder={tenant?.tenantName ?? "Mi Empresa"}
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-medium text-[var(--muted-foreground)] mb-1 block">Color primario</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={portalForm.portalPrimaryColor}
+                      onChange={(e) => setPortalForm((f) => ({ ...f, portalPrimaryColor: e.target.value }))}
+                      className="h-9 w-12 rounded border border-[var(--border)] bg-[var(--input)] cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={portalForm.portalPrimaryColor}
+                      onChange={(e) => setPortalForm((f) => ({ ...f, portalPrimaryColor: e.target.value }))}
+                      className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50"
+                    />
+                  </div>
+                </label>
+                <label className="block">
+                  <span className="text-xs font-medium text-[var(--muted-foreground)] mb-1 block">URL del logo</span>
+                  <input
+                    type="url"
+                    value={portalForm.portalLogo}
+                    onChange={(e) => setPortalForm((f) => ({ ...f, portalLogo: e.target.value }))}
+                    placeholder="https://mi-empresa.com/logo.png"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-medium text-[var(--muted-foreground)] mb-1 block">URL imagen de fondo</span>
+                  <input
+                    type="url"
+                    value={portalForm.portalBgImage}
+                    onChange={(e) => setPortalForm((f) => ({ ...f, portalBgImage: e.target.value }))}
+                    placeholder="https://mi-empresa.com/bg.jpg"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50"
+                  />
+                </label>
+                <label className="block sm:col-span-2">
+                  <span className="text-xs font-medium text-[var(--muted-foreground)] mb-1 block">Mensaje de bienvenida</span>
+                  <input
+                    type="text"
+                    value={portalForm.portalWelcomeText}
+                    onChange={(e) => setPortalForm((f) => ({ ...f, portalWelcomeText: e.target.value }))}
+                    placeholder="Bienvenido a tu casillero virtual"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50"
+                  />
+                </label>
+              </div>
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  onClick={savePortalBranding}
+                  disabled={updateSettings.isPending}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[var(--primary)]/90 disabled:opacity-60 transition-colors"
+                >
+                  {portalSaved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                  {portalSaved ? "Guardado" : updateSettings.isPending ? "Guardando..." : "Guardar"}
+                </button>
+              </div>
+            </div>
           )}
         </DetailCard>
 
