@@ -5,24 +5,19 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Reflector } from "@nestjs/core";
 import { Request } from "express";
 import * as jwt from "jsonwebtoken";
-import { IS_PUBLIC_KEY } from "@/common/decorators/public.decorator";
 
 @Injectable()
 export class CustomerAuthGuard implements CanActivate {
   constructor(
-    private readonly reflector: Reflector,
     private readonly config: ConfigService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) return true;
+    // NOTE: Do NOT check IS_PUBLIC_KEY here. @Public() is used on customer
+    // controllers to bypass the global CombinedAuthGuard, but this guard
+    // must still validate the customer JWT and populate req.customerAuth.
 
     const req = context.switchToHttp().getRequest<Request>();
     const authHeader = req.headers.authorization;
