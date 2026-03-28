@@ -16,6 +16,10 @@ const ReceptionsPage = lazy(() => import("@/pages/receptions"));
 const PostAlertsPage = lazy(() => import("@/pages/post-alerts"));
 const ContainersPage = lazy(() => import("@/pages/containers"));
 const ContainerDetailPage = lazy(() => import("@/pages/containers/[id]"));
+const VoyagesPage = lazy(() => import("@/pages/voyages"));
+const VoyageDetailPage = lazy(() => import("@/pages/voyages/[id]"));
+const TransfersPage = lazy(() => import("@/pages/transfers"));
+const TransferDetailPage = lazy(() => import("@/pages/transfers/[id]"));
 const DgaPage = lazy(() => import("@/pages/dga"));
 const DeliveryOrdersPage = lazy(() => import("@/pages/delivery-orders"));
 const InvoicesPage = lazy(() => import("@/pages/invoices"));
@@ -76,6 +80,10 @@ export default function App() {
               <Route path="post-alerts" element={<PostAlertsPage />} />
               <Route path="containers" element={<ContainersPage />} />
               <Route path="containers/:id" element={<ContainerDetailPage />} />
+              <Route path="voyages" element={<VoyagesPage />} />
+              <Route path="voyages/:id" element={<VoyageDetailPage />} />
+              <Route path="transfers" element={<TransfersPage />} />
+              <Route path="transfers/:id" element={<TransferDetailPage />} />
               <Route path="dga" element={<DgaPage />} />
               <Route path="delivery-orders" element={<DeliveryOrdersPage />} />
               <Route path="delivery-orders/:id" element={<DeliveryOrderDetailPage />} />

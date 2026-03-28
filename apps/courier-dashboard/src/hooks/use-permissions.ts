@@ -3,14 +3,14 @@ import { useAuthStore } from "@/stores/auth.store";
 const ROLE_PERMISSIONS: Record<string, string[]> = {
   ADMIN: [
     "dashboard", "customers", "shipments", "pre-alerts", "receptions",
-    "invoices", "payments", "containers", "dga", "delivery-orders",
+    "invoices", "payments", "containers", "voyages", "transfers", "dga", "delivery-orders",
     "branches", "rate-tables", "analytics", "webhooks", "notifications",
     "ecommerce", "bulk-import", "settings", "post-alerts", "credit-notes",
     "caja-chica", "fleet", "fiscal", "tickets",
   ],
   OPERATOR: [
     "dashboard", "customers", "shipments", "pre-alerts", "receptions",
-    "invoices", "payments", "containers", "dga", "delivery-orders",
+    "invoices", "payments", "containers", "voyages", "transfers", "dga", "delivery-orders",
     "branches", "analytics", "post-alerts", "caja-chica", "fleet", "tickets",
   ],
   INTEGRATION: ["dashboard", "shipments", "analytics"],

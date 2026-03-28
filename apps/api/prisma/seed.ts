@@ -119,6 +119,8 @@ async function seedDemo(pepper: string) {
   ];
 
   // Clean existing demo data
+  await prisma.transferItem.deleteMany({ where: { transfer: { tenantId: tenant.id } } });
+  await prisma.transfer.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.trackingEvent.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.invoiceItem.deleteMany({ where: { invoice: { tenantId: tenant.id } } });
   await prisma.paymentAllocation.deleteMany({ where: { payment: { tenantId: tenant.id } } });
@@ -133,6 +135,7 @@ async function seedDemo(pepper: string) {
   await prisma.invoice.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.shipment.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.container.deleteMany({ where: { tenantId: tenant.id } });
+  await prisma.voyage.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.customer.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.rateTable.deleteMany({ where: { tenantId: tenant.id } });
 
@@ -297,6 +300,26 @@ async function seedDemo(pepper: string) {
     shipments.push(shipment);
   }
 
+  // ── Voyages (Embarcaciones) ──
+  const voyageSea = await prisma.voyage.create({
+    data: {
+      tenantId: tenant.id, number: "ES01-000421", mode: "SEA", status: "IN_PROCESS",
+      date: daysAgo(6), origin: "MIA", destination: "SDQ",
+      carrier: "MSC Mediterranean Shipping", vesselName: "MSC CRISTINA",
+      masterAwb: "MEDU4501234", shipper: "SysPaq Demo Warehouse",
+      consignee: "SysPaq Demo SDQ", departureDate: daysAgo(5), arrivalDate: daysAgo(1),
+    },
+  });
+  const voyageAir = await prisma.voyage.create({
+    data: {
+      tenantId: tenant.id, number: "ES01-000422", mode: "AIR", status: "IN_PROCESS",
+      date: hoursAgo(6), origin: "MIA", destination: "SDQ",
+      carrier: "Copa Airlines Cargo", vesselName: "Copa CM-802",
+      masterAwb: "023-98475620", shipper: "SysPaq Demo Warehouse",
+      consignee: "SysPaq Demo SDQ", departureDate: hoursAgo(5),
+    },
+  });
+
   // ── Container ──
   const container = await prisma.container.create({
     data: {
@@ -307,6 +330,7 @@ async function seedDemo(pepper: string) {
       estimatedDeparture: daysAgo(6), actualDeparture: daysAgo(5),
       estimatedArrival: daysAgo(1), actualArrival: hoursAgo(18),
       totalPieces: 5, totalWeightLbs: 98.5,
+      voyageId: voyageSea.id,
     },
   });
 
@@ -333,6 +357,7 @@ async function seedDemo(pepper: string) {
       estimatedDeparture: hoursAgo(6), actualDeparture: hoursAgo(5),
       estimatedArrival: hoursAgo(1),
       totalPieces: 3, totalWeightLbs: 44.7,
+      voyageId: voyageAir.id,
     },
   });
 
@@ -568,6 +593,33 @@ async function seedDemo(pepper: string) {
     });
   }
 
+  // ── Transfers ──
+  // Transfer: SDQ → STI (delivered shipments moved from sorting center to pickup branch)
+  const demoDelivered = shipments.filter((_, i) => shipmentsData[i].phase === "DELIVERED");
+  if (demoDelivered.length >= 2) {
+    const transferOut = await prisma.transfer.create({
+      data: {
+        tenantId: tenant.id, number: "TS02-000001", type: "OUTBOUND", status: "DISPATCHED",
+        originBranchId: branches[1].id, destBranchId: branches[2].id,
+        dispatchedAt: daysAgo(3), dispatchedBy: "admin@syspaq-demo.com",
+        totalPieces: 2, totalWeightLbs: 15.0,
+      },
+    });
+    const transferIn = await prisma.transfer.create({
+      data: {
+        tenantId: tenant.id, number: "TE03-000001", type: "INBOUND", status: "RECEIVED",
+        originBranchId: branches[1].id, destBranchId: branches[2].id,
+        linkedTransferId: transferOut.id,
+        dispatchedAt: daysAgo(3), receivedAt: daysAgo(2), receivedBy: "operador@syspaq-demo.com",
+        totalPieces: 2, totalWeightLbs: 15.0,
+      },
+    });
+    for (const s of demoDelivered.slice(0, 2)) {
+      await prisma.transferItem.create({ data: { transferId: transferOut.id, shipmentId: s.id, weightLbs: 7.5, pieces: 1 } });
+      await prisma.transferItem.create({ data: { transferId: transferIn.id, shipmentId: s.id, weightLbs: 7.5, pieces: 1 } });
+    }
+  }
+
   console.log("\n--- Demo Seed OK ---");
   console.log("Tenant ID :", tenant.id);
   console.log("Tenant slug:", tenant.slug);
@@ -580,7 +632,7 @@ async function seedDemo(pepper: string) {
   console.log("");
   console.log(`Data created: ${customers.length} customers, ${shipments.length} shipments, ${branches.length} branches`);
   console.log(`             ${invoiceNum} invoices, ${doNum} delivery orders, ${preAlertsData.length} pre-alerts`);
-  console.log(`             2 containers, ${dgaShipments.length} DGA labels, 1 rate table, 2 users`);
+  console.log(`             2 containers, 2 voyages, 2 transfers, ${dgaShipments.length} DGA labels, 1 rate table, 2 users`);
 }
 
 // ─── Blumbox seed ────────────────────────────────────────────────
@@ -697,6 +749,8 @@ async function seedBlumbox(pepper: string) {
   ];
 
   // Clean existing blumbox data
+  await prisma.transferItem.deleteMany({ where: { transfer: { tenantId: tenant.id } } });
+  await prisma.transfer.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.trackingEvent.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.invoiceItem.deleteMany({ where: { invoice: { tenantId: tenant.id } } });
   await prisma.paymentAllocation.deleteMany({ where: { payment: { tenantId: tenant.id } } });
@@ -711,6 +765,7 @@ async function seedBlumbox(pepper: string) {
   await prisma.invoice.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.shipment.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.container.deleteMany({ where: { tenantId: tenant.id } });
+  await prisma.voyage.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.customer.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.rateTable.deleteMany({ where: { tenantId: tenant.id } });
   await prisma.ticket.deleteMany({ where: { tenantId: tenant.id } });
@@ -828,9 +883,13 @@ async function seedBlumbox(pepper: string) {
   };
 
   const shipments = [];
+  const blxSenders = ["AMAZON", "WALMART", "EBAY", "SHEIN", "BEST BUY", "TARGET"];
+  const blxCarriers = ["FLETE COURIER", "DHL EXPRESS", "FEDEX GROUND"];
+
   for (const s of shipmentsData) {
     const customer = customers[s.customer];
     const events = eventSequences[s.phase];
+    const destBranch = branches[shipments.length % branches.length];
 
     const shipment = await prisma.shipment.create({
       data: {
@@ -839,6 +898,17 @@ async function seedBlumbox(pepper: string) {
         reference: s.desc,
         currentPhase: s.phase,
         customerId: customer.id,
+        senderName: blxSenders[shipments.length % blxSenders.length],
+        carrierName: blxCarriers[shipments.length % blxCarriers.length],
+        contentDescription: s.desc,
+        pieces: 1,
+        weightLbs: s.weight,
+        fobValue: s.value,
+        collectionType: "Colectar",
+        destBranchId: destBranch.id,
+        warehouseLocation: ["DELIVERED", "OUT_FOR_DELIVERY"].includes(s.phase)
+          ? `.${destBranch.code.toLowerCase().slice(0, 3)} ${Math.floor(Math.random() * 30)}-${Math.floor(Math.random() * 5)}`
+          : undefined,
         metadata: { weight: s.weight, declaredValue: s.value, description: s.desc },
       },
     });
@@ -865,6 +935,28 @@ async function seedBlumbox(pepper: string) {
     shipments.push(shipment);
   }
 
+  // ── Voyages (Embarcaciones) ──
+  const blxVoyageSea = await prisma.voyage.create({
+    data: {
+      tenantId: tenant.id, number: "ES01-001201", mode: "SEA", status: "IN_PROCESS",
+      date: daysAgo(4), origin: "MIA", destination: "SDQ",
+      carrier: "MSC Mediterranean Shipping", vesselName: "MSC ANNA",
+      masterAwb: "MEDU8901234", shipper: "Blumbox Miami Warehouse",
+      consignee: "Blumbox Santo Domingo", agent: "Freight Solutions RD",
+      departureDate: daysAgo(3),
+    },
+  });
+  const blxVoyageAir = await prisma.voyage.create({
+    data: {
+      tenantId: tenant.id, number: "ES01-001202", mode: "AIR", status: "COMPLETED",
+      date: daysAgo(14), origin: "MIA", destination: "SDQ",
+      carrier: "Arajet", vesselName: "Arajet DM-1042",
+      masterAwb: "045-12398760", shipper: "Blumbox Miami Warehouse",
+      consignee: "Blumbox Santo Domingo",
+      departureDate: daysAgo(14), arrivalDate: daysAgo(13), completedAt: daysAgo(12),
+    },
+  });
+
   // ── Containers ──
   // 1. Maritime FCL — IN_TRANSIT
   const containerFCL = await prisma.container.create({
@@ -876,6 +968,7 @@ async function seedBlumbox(pepper: string) {
       estimatedDeparture: daysAgo(4), actualDeparture: daysAgo(3),
       estimatedArrival: daysAgo(-2),
       totalPieces: 5, totalWeightLbs: 57.7,
+      voyageId: blxVoyageSea.id,
     },
   });
 
@@ -902,6 +995,7 @@ async function seedBlumbox(pepper: string) {
       estimatedDeparture: daysAgo(8), actualDeparture: daysAgo(7),
       estimatedArrival: daysAgo(2), actualArrival: daysAgo(1),
       totalPieces: 4, totalWeightLbs: 81.5,
+      voyageId: blxVoyageSea.id,
     },
   });
 
@@ -928,6 +1022,7 @@ async function seedBlumbox(pepper: string) {
       estimatedDeparture: daysAgo(14), actualDeparture: daysAgo(14),
       estimatedArrival: daysAgo(13), actualArrival: daysAgo(13),
       totalPieces: 3, totalWeightLbs: 21.1,
+      voyageId: blxVoyageAir.id,
     },
   });
 
@@ -1206,6 +1301,43 @@ async function seedBlumbox(pepper: string) {
     });
   }
 
+  // ── Transfers ──
+  const blxDelivered = shipments.filter((_, i) => shipmentsData[i].phase === "DELIVERED");
+  if (blxDelivered.length >= 3 && branches.length >= 2) {
+    const blxTransferOut = await prisma.transfer.create({
+      data: {
+        tenantId: tenant.id, number: "TS02-000101", type: "OUTBOUND", status: "DISPATCHED",
+        originBranchId: branches[0].id, destBranchId: branches[1].id,
+        dispatchedAt: daysAgo(5), dispatchedBy: "admin@blumbox.com.do",
+        totalPieces: 3, totalWeightLbs: 22.5,
+      },
+    });
+    const blxTransferIn = await prisma.transfer.create({
+      data: {
+        tenantId: tenant.id, number: "TE03-000101", type: "INBOUND", status: "RECEIVED",
+        originBranchId: branches[0].id, destBranchId: branches[1].id,
+        linkedTransferId: blxTransferOut.id,
+        dispatchedAt: daysAgo(5), receivedAt: daysAgo(4), receivedBy: "operaciones@blumbox.com.do",
+        totalPieces: 3, totalWeightLbs: 22.5,
+      },
+    });
+    for (const s of blxDelivered.slice(0, 3)) {
+      await prisma.transferItem.create({ data: { transferId: blxTransferOut.id, shipmentId: s.id, weightLbs: 7.5, pieces: 1 } });
+      await prisma.transferItem.create({ data: { transferId: blxTransferIn.id, shipmentId: s.id, weightLbs: 7.5, pieces: 1 } });
+    }
+
+    // Another pending transfer
+    const blxTransferPending = await prisma.transfer.create({
+      data: {
+        tenantId: tenant.id, number: "TS02-000102", type: "OUTBOUND", status: "PENDING",
+        originBranchId: branches[1].id, destBranchId: branches.length > 2 ? branches[2].id : branches[0].id,
+        totalPieces: 0, totalWeightLbs: 0,
+        notes: "Pendiente para despacho a sucursal",
+      },
+    });
+    void blxTransferPending;
+  }
+
   console.log("\n--- Blumbox Seed OK ---");
   console.log("Tenant ID :", tenant.id);
   console.log("Tenant slug:", tenant.slug);
@@ -1218,7 +1350,7 @@ async function seedBlumbox(pepper: string) {
   console.log("");
   console.log(`Data created: ${customers.length} customers, ${shipments.length} shipments, ${branches.length} branches`);
   console.log(`             ${invoiceNum} invoices, ${doNum} delivery orders, ${preAlertsData.length} pre-alerts`);
-  console.log(`             3 containers, 6 DGA labels, 1 rate table, 2 users, ${ticketsData.length} tickets`);
+  console.log(`             3 containers, 2 voyages, 3 transfers, 6 DGA labels, 1 rate table, 2 users, ${ticketsData.length} tickets`);
   console.log(`             ${receptionCount} receptions, 2 notification templates`);
 }
 

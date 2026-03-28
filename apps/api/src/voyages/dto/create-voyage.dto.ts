@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { ContainerType, ShippingMode } from "@prisma/client";
+import { ShippingMode } from "@prisma/client";
 import {
   IsDateString,
   IsEnum,
@@ -8,19 +8,20 @@ import {
   MaxLength,
 } from "class-validator";
 
-export class CreateContainerDto {
-  @ApiProperty({ example: "MSKU1234567", maxLength: 30 })
+export class CreateVoyageDto {
+  @ApiProperty({ example: "VYG-2026-001", maxLength: 30 })
   @IsString()
   @MaxLength(30)
   number!: string;
 
-  @ApiProperty({ enum: ContainerType })
-  @IsEnum(ContainerType)
-  type!: ContainerType;
-
   @ApiProperty({ enum: ShippingMode })
   @IsEnum(ShippingMode)
   mode!: ShippingMode;
+
+  @ApiPropertyOptional({ example: "2026-04-01T00:00:00.000Z" })
+  @IsOptional()
+  @IsDateString()
+  date?: string;
 
   @ApiPropertyOptional({ example: "MIA" })
   @IsOptional()
@@ -45,35 +46,40 @@ export class CreateContainerDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  voyageNumber?: string;
+  masterAwb?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  blNumber?: string;
+  shipper?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  sealNumber?: string;
+  consignee?: string;
 
-  @ApiPropertyOptional({ example: "2026-04-01T00:00:00.000Z" })
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDateString()
-  estimatedDeparture?: string;
+  @IsString()
+  notifyParty?: string;
 
-  @ApiPropertyOptional({ example: "2026-04-10T00:00:00.000Z" })
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDateString()
-  estimatedArrival?: string;
+  @IsString()
+  agent?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ description: "ID de la embarcación (voyage) asociada" })
+  @ApiPropertyOptional({ example: "2026-04-01T00:00:00.000Z" })
   @IsOptional()
-  @IsString()
-  voyageId?: string;
+  @IsDateString()
+  departureDate?: string;
+
+  @ApiPropertyOptional({ example: "2026-04-10T00:00:00.000Z" })
+  @IsOptional()
+  @IsDateString()
+  arrivalDate?: string;
 }

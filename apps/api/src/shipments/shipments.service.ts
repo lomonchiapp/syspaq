@@ -8,6 +8,7 @@ import { PrismaService } from "@/prisma/prisma.service";
 import { resolvePhaseAfterEvent } from "./tracking-state-machine";
 import { AddEventDto } from "./dto/add-event.dto";
 import { CreateShipmentDto } from "./dto/create-shipment.dto";
+import { UpdateShipmentDto } from "./dto/update-shipment.dto";
 
 @Injectable()
 export class ShipmentsService {
@@ -16,11 +17,30 @@ export class ShipmentsService {
   async create(tenantId: string, dto: CreateShipmentDto) {
     try {
       return await this.prisma.$transaction(async (tx) => {
+        const volWeight = dto.lengthCm && dto.widthCm && dto.heightCm
+          ? (dto.lengthCm * dto.widthCm * dto.heightCm) / 5000 * 2.20462
+          : undefined;
+
         const shipment = await tx.shipment.create({
           data: {
             tenantId,
             trackingNumber: dto.trackingNumber,
             reference: dto.reference,
+            customerId: dto.customerId,
+            senderName: dto.senderName,
+            carrierName: dto.carrierName,
+            contentDescription: dto.contentDescription,
+            pieces: dto.pieces,
+            weightLbs: dto.weightLbs,
+            volumetricWeight: volWeight ?? dto.weightLbs,
+            lengthCm: dto.lengthCm,
+            widthCm: dto.widthCm,
+            heightCm: dto.heightCm,
+            fobValue: dto.fobValue,
+            fobCurrency: dto.fobCurrency,
+            collectionType: dto.collectionType,
+            destBranchId: dto.destBranchId,
+            warehouseLocation: dto.warehouseLocation,
             metadata: (dto.metadata ?? {}) as Prisma.InputJsonValue,
             currentPhase: "CREATED",
           },
@@ -47,17 +67,41 @@ export class ShipmentsService {
     }
   }
 
-  async list(tenantId: string, page = 1, limit = 20) {
+  async list(
+    tenantId: string,
+    page = 1,
+    limit = 20,
+    search?: string,
+    phase?: string,
+    customerId?: string,
+    destBranchId?: string,
+  ) {
     const skip = (page - 1) * limit;
+    const where: Prisma.ShipmentWhereInput = { tenantId };
+    if (phase) where.currentPhase = phase as any;
+    if (customerId) where.customerId = customerId;
+    if (destBranchId) where.destBranchId = destBranchId;
+    if (search) {
+      where.OR = [
+        { trackingNumber: { contains: search, mode: "insensitive" } },
+        { senderName: { contains: search, mode: "insensitive" } },
+        { reference: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.shipment.findMany({
-        where: { tenantId },
+        where,
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
-        include: { _count: { select: { events: true } } },
+        include: {
+          _count: { select: { events: true } },
+          customer: { select: { casillero: true, firstName: true, lastName: true } },
+          destBranch: { select: { code: true, name: true } },
+        },
       }),
-      this.prisma.shipment.count({ where: { tenantId } }),
+      this.prisma.shipment.count({ where }),
     ]);
 
     return {
@@ -66,6 +110,19 @@ export class ShipmentsService {
         trackingNumber: s.trackingNumber,
         reference: s.reference,
         currentPhase: s.currentPhase,
+        senderName: s.senderName,
+        carrierName: s.carrierName,
+        contentDescription: s.contentDescription,
+        pieces: s.pieces,
+        weightLbs: s.weightLbs ? Number(s.weightLbs) : null,
+        volumetricWeight: s.volumetricWeight ? Number(s.volumetricWeight) : null,
+        fobValue: s.fobValue ? Number(s.fobValue) : null,
+        collectionType: s.collectionType,
+        warehouseLocation: s.warehouseLocation,
+        destBranchCode: s.destBranch?.code ?? null,
+        destBranchName: s.destBranch?.name ?? null,
+        customerCasillero: s.customer?.casillero ?? null,
+        customerName: s.customer ? `${s.customer.firstName} ${s.customer.lastName}` : null,
         metadata: s.metadata,
         createdAt: s.createdAt,
         updatedAt: s.updatedAt,
@@ -73,6 +130,39 @@ export class ShipmentsService {
       })),
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
+  }
+
+  async update(tenantId: string, id: string, dto: UpdateShipmentDto) {
+    await this.findOne(tenantId, id);
+    const data: Prisma.ShipmentUpdateInput = {};
+    if (dto.reference !== undefined) data.reference = dto.reference;
+    if (dto.senderName !== undefined) data.senderName = dto.senderName;
+    if (dto.carrierName !== undefined) data.carrierName = dto.carrierName;
+    if (dto.contentDescription !== undefined) data.contentDescription = dto.contentDescription;
+    if (dto.pieces !== undefined) data.pieces = dto.pieces;
+    if (dto.weightLbs !== undefined) data.weightLbs = dto.weightLbs;
+    if (dto.lengthCm !== undefined) data.lengthCm = dto.lengthCm;
+    if (dto.widthCm !== undefined) data.widthCm = dto.widthCm;
+    if (dto.heightCm !== undefined) data.heightCm = dto.heightCm;
+    if (dto.fobValue !== undefined) data.fobValue = dto.fobValue;
+    if (dto.fobCurrency !== undefined) data.fobCurrency = dto.fobCurrency;
+    if (dto.collectionType !== undefined) data.collectionType = dto.collectionType;
+    if (dto.warehouseLocation !== undefined) data.warehouseLocation = dto.warehouseLocation;
+    if (dto.destBranchId !== undefined) data.destBranch = { connect: { id: dto.destBranchId } };
+    if (dto.customerId !== undefined) data.customer = { connect: { id: dto.customerId } };
+
+    // Recalculate volumetric weight if dimensions changed
+    if (dto.lengthCm !== undefined || dto.widthCm !== undefined || dto.heightCm !== undefined) {
+      const current = await this.prisma.shipment.findUnique({ where: { id } });
+      const l = dto.lengthCm ?? (current?.lengthCm ? Number(current.lengthCm) : 0);
+      const w = dto.widthCm ?? (current?.widthCm ? Number(current.widthCm) : 0);
+      const h = dto.heightCm ?? (current?.heightCm ? Number(current.heightCm) : 0);
+      if (l > 0 && w > 0 && h > 0) {
+        data.volumetricWeight = (l * w * h) / 5000 * 2.20462;
+      }
+    }
+
+    return this.prisma.shipment.update({ where: { id }, data });
   }
 
   async findOne(tenantId: string, id: string) {

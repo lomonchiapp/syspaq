@@ -4,11 +4,19 @@ import { TrackingEventType, TrackingPhase } from "@prisma/client";
 /**
  * Determina la fase resultante tras un evento (null = sin cambio de fase, p.ej. NOTE).
  */
+/** Event types that record operational info without changing the shipment phase. */
+const NO_PHASE_CHANGE = new Set<TrackingEventType>([
+  TrackingEventType.NOTE,
+  TrackingEventType.CONTAINERIZED,
+  TrackingEventType.LOCATION_ASSIGNED,
+  TrackingEventType.INVOICED,
+]);
+
 export function resolvePhaseAfterEvent(
   current: TrackingPhase,
   eventType: TrackingEventType
 ): TrackingPhase | null {
-  if (eventType === TrackingEventType.NOTE) return null;
+  if (NO_PHASE_CHANGE.has(eventType)) return null;
 
   const target = EVENT_TO_PHASE[eventType];
   if (!target) {
@@ -35,6 +43,11 @@ const EVENT_TO_PHASE: Partial<Record<TrackingEventType, TrackingPhase>> = {
   [TrackingEventType.OUT_FOR_DELIVERY]: TrackingPhase.OUT_FOR_DELIVERY,
   [TrackingEventType.DELIVERED]: TrackingPhase.DELIVERED,
   [TrackingEventType.EXCEPTION]: TrackingPhase.EXCEPTION,
+  // Courier flow events
+  [TrackingEventType.WAREHOUSE_RECEIVED]: TrackingPhase.RECEIVED,
+  [TrackingEventType.TRANSFER_DISPATCHED]: TrackingPhase.IN_TRANSIT,
+  [TrackingEventType.TRANSFER_RECEIVED]: TrackingPhase.RECEIVED,
+  [TrackingEventType.AVAILABLE_FOR_PICKUP]: TrackingPhase.OUT_FOR_DELIVERY,
 };
 
 /** Reglas mínimas de progresión; EXCEPTION puede ocurrir desde casi cualquier fase operativa. */
@@ -82,6 +95,7 @@ const ALLOWED_NEXT: Record<TrackingPhase, TrackingPhase[]> = {
   ],
   [TrackingPhase.CLEARED]: [
     TrackingPhase.CLEARED,
+    TrackingPhase.RECEIVED,
     TrackingPhase.IN_TRANSIT,
     TrackingPhase.OUT_FOR_DELIVERY,
     TrackingPhase.DELIVERED,

@@ -9,6 +9,8 @@ import {
   PackageCheck,
   CheckCircle,
   Ship,
+  Plane,
+  ArrowLeftRight,
   FileCheck,
   Truck,
   FileText,
@@ -75,7 +77,9 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: "Logistica",
     items: [
+      { label: "Embarcaciones", path: "/voyages", icon: Plane, permission: "voyages" },
       { label: "Contenedores", path: "/containers", icon: Ship, permission: "containers" },
+      { label: "Transferencias", path: "/transfers", icon: ArrowLeftRight, permission: "transfers" },
       { label: "DGA", path: "/dga", icon: FileCheck, permission: "dga" },
       { label: "Ordenes Entrega", path: "/delivery-orders", icon: Truck, permission: "delivery-orders" },
     ],

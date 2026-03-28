@@ -58,6 +58,7 @@ export class ContainersService {
             ? new Date(dto.estimatedArrival)
             : undefined,
           notes: dto.notes,
+          voyageId: dto.voyageId,
         },
       });
     } catch (e) {
@@ -118,6 +119,7 @@ export class ContainersService {
     const container = await this.prisma.container.findFirst({
       where: { id, tenantId },
       include: {
+        voyage: { select: { id: true, number: true, carrier: true, masterAwb: true, status: true } },
         items: {
           include: {
             shipment: {
@@ -127,6 +129,12 @@ export class ContainersService {
                 reference: true,
                 currentPhase: true,
                 customerId: true,
+                senderName: true,
+                carrierName: true,
+                contentDescription: true,
+                weightLbs: true,
+                pieces: true,
+                warehouseLocation: true,
               },
             },
           },
@@ -163,6 +171,7 @@ export class ContainersService {
           estimatedArrival: new Date(dto.estimatedArrival),
         }),
         ...(dto.notes !== undefined && { notes: dto.notes }),
+        ...(dto.voyageId !== undefined && { voyageId: dto.voyageId }),
       },
     });
   }
@@ -196,6 +205,22 @@ export class ContainersService {
           data: {
             totalPieces: agg._sum.pieces ?? 0,
             totalWeightLbs: agg._sum.weightLbs ?? null,
+          },
+        });
+
+        // Fire CONTAINERIZED tracking event
+        await tx.trackingEvent.create({
+          data: {
+            tenantId,
+            shipmentId: dto.shipmentId,
+            occurredAt: new Date(),
+            type: TrackingEventType.CONTAINERIZED,
+            source: EventSource.SYSTEM,
+            payload: {
+              containerId: container.id,
+              containerNumber: container.number,
+              destination: container.destination,
+            },
           },
         });
 

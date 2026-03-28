@@ -59,6 +59,8 @@ model Tenant {
   fiscalReports         FiscalReport[]
   tickets               Ticket[]
   driverSessions        DriverSession[]
+  voyages               Voyage[]
+  transfers             Transfer[]
 }
 
 model ApiKey {
@@ -119,8 +121,26 @@ model Shipment {
 
   customerId String?       @map("customer_id")
 
+  // ── Extended courier fields ──
+  senderName         String?   @map("sender_name")
+  carrierName        String?   @map("carrier_name")
+  contentDescription String?   @map("content_description")
+  pieces             Int       @default(1)
+  weightLbs          Decimal?  @map("weight_lbs") @db.Decimal(8, 2)
+  volumetricWeight   Decimal?  @map("volumetric_weight") @db.Decimal(8, 2)
+  lengthCm           Decimal?  @map("length_cm") @db.Decimal(8, 2)
+  widthCm            Decimal?  @map("width_cm") @db.Decimal(8, 2)
+  heightCm           Decimal?  @map("height_cm") @db.Decimal(8, 2)
+  cubicFeet          Decimal?  @map("cubic_feet") @db.Decimal(8, 2)
+  fobValue           Decimal?  @map("fob_value") @db.Decimal(12, 2)
+  fobCurrency        String    @default("USD") @map("fob_currency")
+  collectionType     String?   @map("collection_type")
+  warehouseLocation  String?   @map("warehouse_location")
+  destBranchId       String?   @map("dest_branch_id")
+
   tenant     Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   customer   Customer?       @relation(fields: [customerId], references: [id])
+  destBranch Branch?         @relation("ShipmentDest", fields: [destBranchId], references: [id])
   events         TrackingEvent[]
   preAlerts      PreAlert[]
   receptions     Reception[]
@@ -129,10 +149,12 @@ model Shipment {
   invoiceItems   InvoiceItem[]
   containerItems ContainerItem[]
   dgaLabels      DgaLabel[]
+  transferItems  TransferItem[]
 
   @@unique([tenantId, trackingNumber])
   @@index([tenantId])
   @@index([tenantId, customerId])
+  @@index([tenantId, destBranchId])
   @@map("shipments")
 }
 
@@ -182,6 +204,14 @@ enum TrackingEventType {
   DELIVERED
   EXCEPTION
   NOTE
+  // Courier flow events
+  WAREHOUSE_RECEIVED
+  CONTAINERIZED
+  TRANSFER_DISPATCHED
+  TRANSFER_RECEIVED
+  LOCATION_ASSIGNED
+  AVAILABLE_FOR_PICKUP
+  INVOICED
 }
 
 enum EventSource {
@@ -286,6 +316,9 @@ model Branch {
   cajaChicaTransactions CajaChicaTransaction[]
   vehicles              Vehicle[]
   routes                Route[]
+  shipmentsDest         Shipment[]             @relation("ShipmentDest")
+  transfersOut          Transfer[]             @relation("TransferOrigin")
+  transfersIn           Transfer[]             @relation("TransferDest")
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -798,12 +831,16 @@ model Container {
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
 
+  voyageId           String?         @map("voyage_id")
+
   tenant    Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  voyage    Voyage?         @relation(fields: [voyageId], references: [id])
   items     ContainerItem[]
   dgaLabels DgaLabel[]
 
   @@unique([tenantId, number])
   @@index([tenantId, status])
+  @@index([tenantId, voyageId])
   @@map("containers")
 }
 
@@ -833,6 +870,110 @@ enum ContainerType {
 enum ShippingMode {
   SEA
   AIR
+}
+
+// ─── Voyages (Embarcaciones) ───
+
+model Voyage {
+  id              String       @id @default(uuid())
+  tenantId        String       @map("tenant_id")
+  number          String
+  mode            ShippingMode
+  status          VoyageStatus @default(IN_PROCESS)
+  date            DateTime?
+  origin          String?
+  destination     String?
+  carrier         String?
+  vesselName      String?      @map("vessel_name")
+  masterAwb       String?      @map("master_awb")
+  shipper         String?
+  consignee       String?
+  notifyParty     String?      @map("notify_party")
+  agent           String?
+  notes           String?
+  departureDate   DateTime?    @map("departure_date")
+  arrivalDate     DateTime?    @map("arrival_date")
+  completedAt     DateTime?    @map("completed_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  containers Container[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+  @@map("voyages")
+}
+
+enum VoyageStatus {
+  IN_PROCESS
+  COMPLETED
+  CANCELLED
+}
+
+// ─── Transfers (Transferencias) ───
+
+model Transfer {
+  id               String         @id @default(uuid())
+  tenantId         String         @map("tenant_id")
+  number           String
+  type             TransferType
+  status           TransferStatus @default(PENDING)
+  originBranchId   String         @map("origin_branch_id")
+  destBranchId     String         @map("dest_branch_id")
+  linkedTransferId String?        @unique @map("linked_transfer_id")
+  dispatchedAt     DateTime?      @map("dispatched_at")
+  receivedAt       DateTime?      @map("received_at")
+  dispatchedBy     String?        @map("dispatched_by")
+  receivedBy       String?        @map("received_by")
+  totalPieces      Int            @default(0) @map("total_pieces")
+  totalWeightLbs   Decimal?       @map("total_weight_lbs") @db.Decimal(10, 2)
+  notes            String?
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  originBranch   Branch         @relation("TransferOrigin", fields: [originBranchId], references: [id])
+  destBranch     Branch         @relation("TransferDest", fields: [destBranchId], references: [id])
+  linkedTransfer Transfer?      @relation("TransferLink", fields: [linkedTransferId], references: [id])
+  counterpart    Transfer?      @relation("TransferLink")
+  items          TransferItem[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+  @@index([tenantId, originBranchId])
+  @@index([tenantId, destBranchId])
+  @@map("transfers")
+}
+
+model TransferItem {
+  id         String   @id @default(uuid())
+  transferId String   @map("transfer_id")
+  shipmentId String   @map("shipment_id")
+  weightLbs  Decimal? @map("weight_lbs") @db.Decimal(8, 2)
+  pieces     Int      @default(1)
+  notes      String?
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  transfer Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  shipment Shipment @relation(fields: [shipmentId], references: [id])
+
+  @@unique([transferId, shipmentId])
+  @@index([transferId])
+  @@map("transfer_items")
+}
+
+enum TransferType {
+  OUTBOUND
+  INBOUND
+}
+
+enum TransferStatus {
+  PENDING
+  DISPATCHED
+  IN_TRANSIT
+  RECEIVED
+  CANCELLED
 }
 
 enum ContainerStatus {
