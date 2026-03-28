@@ -114,7 +114,46 @@ All queries filter by `tenantId` from `req.auth`. No cross-tenant data access.
 ```
 
 ### Database
-Schema in `prisma/schema.prisma`. Core: Tenant, ApiKey, Shipment, TrackingEvent, Customer, Branch, PreAlert, Invoice, Payment, DeliveryOrder, Container, DgaLabel, NotificationTemplate, AuditLog.
+Schema in `prisma/schema.prisma`. Core models:
+
+**Auth & Tenant:** Tenant, ApiKey, User, AuditLog
+**Customers:** Customer (casillero, portal auth)
+**Shipments:** Shipment (extended: senderName, carrierName, contentDescription, pieces, weightLbs, volumetricWeight, fobValue, collectionType, warehouseLocation, destBranchId), TrackingEvent
+**Logistics:** Container, ContainerItem, Voyage (embarcaciones — groups containers), Transfer, TransferItem (inter-branch movement)
+**Warehousing:** Branch, Reception
+**Alerting:** PreAlert, PostAlert
+**Billing:** Invoice, InvoiceItem, Payment, PaymentAllocation, CreditNote, RateTable, RateTier
+**Customs:** DgaLabel
+**Delivery:** DeliveryOrder, Driver, Vehicle, Route, RouteStop
+**Cash:** CajaChicaSession, CajaChicaTransaction
+**Fiscal:** FiscalSequence, FiscalReport
+**Support:** Ticket, TicketComment
+**Notifications:** NotificationTemplate, NotificationLog, WebhookSubscription
+**E-commerce:** EcommerceConnection, BulkImport
+
+### Courier Workflow (Dominican model)
+
+The system models the full international courier flow:
+
+```
+Miami Warehouse          Embarcación (Voyage)       Distribution Center       Branch Offices
+─────────────────       ─────────────────────      ──────────────────────    ─────────────────
+1. Reception (CO020)    4. Voyage groups            7. Receive shipment      10. Transfer received
+2. Digitize pkg (CO001)    containers               8. Customs (DGA)         11. Assign location
+3. Containerize (CO012) 5. Depart (IN_TRANSIT)      9. Transfer to branch    12. Invoice & deliver
+                        6. Arrive (IN_PORT)
+```
+
+**Key entities and their relationships:**
+- **Voyage** (`/v1/voyages`) — An embarcación (flight/vessel) that carries multiple Containers. Has carrier, masterAwb, ports, status (IN_PROCESS → COMPLETED).
+- **Container** (`/v1/containers`) — Groups shipments for transport. Linked to a Voyage via `voyageId`. Status: OPEN → CLOSED → IN_TRANSIT → IN_PORT → IN_CUSTOMS → CLEARED → DELIVERED.
+- **Transfer** (`/v1/transfers`) — Inter-branch package movement. Created as OUTBOUND at origin; dispatching auto-creates an INBOUND counterpart at destination (linked via `linkedTransferId`). Fires TRANSFER_DISPATCHED/TRANSFER_RECEIVED tracking events on all contained shipments.
+- **Shipment** (`/v1/shipments`) — Core package entity with full courier metadata (sender, carrier, content, weight, FOB, warehouse location, destination branch).
+
+**Tracking event types (18 total):**
+CREATED, RECEIVED, DEPARTED, ARRIVED, IN_TRANSIT, CUSTOMS_IN, CUSTOMS_CLEARED, OUT_FOR_DELIVERY, DELIVERED, EXCEPTION, NOTE, WAREHOUSE_RECEIVED, CONTAINERIZED, TRANSFER_DISPATCHED, TRANSFER_RECEIVED, LOCATION_ASSIGNED, AVAILABLE_FOR_PICKUP, INVOICED
+
+**Events that don't change phase:** NOTE, CONTAINERIZED, LOCATION_ASSIGNED, INVOICED (return null from state machine).
 
 ## apps/courier-dashboard/ — React Frontend
 
@@ -140,7 +179,16 @@ Login posts API key + tenant ID to `/v1/auth/token`, decodes JWT. Three roles: `
 `@` → `./src` (in `vite.config.ts` and `tsconfig.app.json`).
 
 ### Domain
-Courier logistics: customers (casilleros), shipments, tracking events, pre-alerts, receptions, post-alerts, containers, DGA (customs), delivery orders, invoices, payments, credit notes, branches, rate tables, webhooks, e-commerce, bulk imports, notifications, analytics.
+Courier logistics: customers (casilleros), shipments, tracking events, pre-alerts, receptions, post-alerts, **voyages (embarcaciones)**, containers, **transfers (transferencias)**, DGA (customs), delivery orders, invoices, payments, credit notes, branches, rate tables, webhooks, e-commerce, bulk imports, notifications, analytics, fleet, fiscal, caja chica, tickets.
+
+### Dashboard Sidebar Sections
+- **General:** Dashboard, Analytics
+- **Operaciones:** Clientes, Envios, Pre-Alertas, Recepciones, Post-Alertas
+- **Logistica:** Embarcaciones, Contenedores, Transferencias, DGA, Ordenes Entrega
+- **Flota:** Panel Flota
+- **Facturacion:** Facturas, Pagos, Notas de Credito, Caja Chica, Fiscal
+- **Configuracion:** Sucursales, Tarifas, Webhooks, Notificaciones, E-commerce, Import, Ajustes
+- **Soporte:** Tickets
 
 ## apps/syspaq-landing/ — Marketing Site
 
@@ -155,9 +203,22 @@ The seed script (`prisma/seed.ts`) creates a "demo" tenant with realistic data. 
 - API Key: `spq_demo_syspaq-sandbox-2025`
 - User login: `admin@syspaq-demo.com` / `demo1234`
 
-**Data created:** 8 customers, 21 shipments (across all phases), 4 branches (Miami warehouse, SDQ office, STI pickup, AILA sorting center), 2 containers (sea + air), DGA labels, invoices with payments, delivery orders, pre-alerts, post-alerts, rate table, notification templates.
+**Data created:** 8 customers, 21 shipments (across all phases with extended courier fields), 4 branches (Miami warehouse, SDQ office, STI pickup, AILA sorting center), 2 voyages (sea + air), 2 containers linked to voyages, 2 transfers (dispatched + received pair), DGA labels, invoices with payments, delivery orders, pre-alerts, post-alerts, rate table, notification templates, tickets.
 
 The landing page CTA section displays these credentials with copy buttons and links to the dashboard.
+
+### Blumbox Client Tenant
+
+The seed also creates a "blumbox" tenant for the client demo:
+
+**Blumbox credentials:**
+- Tenant slug: `blumbox`
+- Tenant ID: `2f193f7c-8571-4370-ada0-bd770aef1589`
+- API Key: `spq_blumbox_courier-integration-2025`
+- Dashboard login: `admin@blumbox.com.do` / `blumbox2025`
+- Customer portal login: `ramon.feliz@gmail.com` / `blumbox2025` (casillero BLX-0001)
+
+**Data created:** 15 customers, 35 shipments, 4 branches, 2 voyages, 3 containers, 3 transfers, 20 pre-alerts, 15 receptions, 10 invoices, 8 delivery orders, 6 DGA labels, 5 tickets, 1 rate table, 2 notification templates.
 
 ## Deploying the API
 
