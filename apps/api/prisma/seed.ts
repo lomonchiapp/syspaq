@@ -886,10 +886,11 @@ async function seedBlumbox(pepper: string) {
   const blxSenders = ["AMAZON", "WALMART", "EBAY", "SHEIN", "BEST BUY", "TARGET"];
   const blxCarriers = ["FLETE COURIER", "DHL EXPRESS", "FEDEX GROUND"];
 
-  for (const s of shipmentsData) {
+  for (let si = 0; si < shipmentsData.length; si++) {
+    const s = shipmentsData[si];
     const customer = customers[s.customer];
     const events = eventSequences[s.phase];
-    const destBranch = branches[shipments.length % branches.length];
+    const destBranch = branches[si % branches.length];
 
     const shipment = await prisma.shipment.create({
       data: {
@@ -898,8 +899,8 @@ async function seedBlumbox(pepper: string) {
         reference: s.desc,
         currentPhase: s.phase,
         customerId: customer.id,
-        senderName: blxSenders[shipments.length % blxSenders.length],
-        carrierName: blxCarriers[shipments.length % blxCarriers.length],
+        senderName: blxSenders[si % blxSenders.length],
+        carrierName: blxCarriers[si % blxCarriers.length],
         contentDescription: s.desc,
         pieces: 1,
         weightLbs: s.weight,
