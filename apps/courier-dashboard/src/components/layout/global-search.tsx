@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, Users, Package, Inbox, Loader2 } from "lucide-react";
+import { Search, Users, Package, Inbox, Ship, Plane, ArrowLeftRight, Loader2 } from "lucide-react";
 import { cn } from "@syspaq/ui";
 import { api } from "@/lib/api-client";
 
-type SearchCategory = "customers" | "shipments" | "receptions";
+type SearchCategory = "customers" | "shipments" | "receptions" | "containers" | "voyages" | "transfers";
 
 interface SearchResult {
   id: string;
@@ -20,8 +20,11 @@ const CATEGORIES: {
   icon: typeof Users;
   placeholder: string;
 }[] = [
-  { key: "customers", label: "Cliente", icon: Users, placeholder: "Nombre, email o casillero..." },
-  { key: "shipments", label: "Envio", icon: Package, placeholder: "Tracking o referencia..." },
+  { key: "customers", label: "Casillero", icon: Users, placeholder: "Nombre, email o casillero..." },
+  { key: "shipments", label: "Paquete", icon: Package, placeholder: "Tracking o referencia..." },
+  { key: "containers", label: "Contenedor", icon: Ship, placeholder: "Numero de contenedor..." },
+  { key: "voyages", label: "Embarcacion", icon: Plane, placeholder: "Numero, carrier o AWB..." },
+  { key: "transfers", label: "Transferencia", icon: ArrowLeftRight, placeholder: "Numero de transferencia..." },
   { key: "receptions", label: "Recepcion", icon: Inbox, placeholder: "ID de envio o sucursal..." },
 ];
 
@@ -73,6 +76,42 @@ export function GlobalSearch() {
               label: s.trackingNumber,
               sublabel: s.reference || s.phase,
               path: `/shipments/${s.id}`,
+            })),
+          );
+        } else if (cat === "containers") {
+          const res = await api.get<{
+            data: { id: string; number: string; mode: string; status: string; destination?: string }[];
+          }>(`/v1/containers?${params}`);
+          setResults(
+            res.data.map((c) => ({
+              id: c.id,
+              label: c.number,
+              sublabel: `${c.mode} - ${c.status}${c.destination ? ` → ${c.destination}` : ""}`,
+              path: `/containers/${c.id}`,
+            })),
+          );
+        } else if (cat === "voyages") {
+          const res = await api.get<{
+            data: { id: string; number: string; carrier?: string; masterAwb?: string; status: string; mode: string }[];
+          }>(`/v1/voyages?${params}`);
+          setResults(
+            res.data.map((v) => ({
+              id: v.id,
+              label: v.number,
+              sublabel: `${v.mode} - ${v.carrier ?? ""}${v.masterAwb ? ` (${v.masterAwb})` : ""} - ${v.status}`,
+              path: `/voyages/${v.id}`,
+            })),
+          );
+        } else if (cat === "transfers") {
+          const res = await api.get<{
+            data: { id: string; number: string; type: string; status: string; originBranch?: { code: string }; destBranch?: { code: string } }[];
+          }>(`/v1/transfers?${params}`);
+          setResults(
+            res.data.map((t) => ({
+              id: t.id,
+              label: t.number,
+              sublabel: `${t.type === "OUTBOUND" ? "Salida" : "Entrada"} - ${t.originBranch?.code ?? ""} → ${t.destBranch?.code ?? ""} - ${t.status}`,
+              path: `/transfers/${t.id}`,
             })),
           );
         } else {

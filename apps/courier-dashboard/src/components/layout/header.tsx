@@ -197,7 +197,7 @@ export function Header() {
         "bg-[var(--card)] border-b border-[var(--border)]",
       )}
     >
-      {/* Left: Collapse toggle + page title */}
+      {/* Left: Collapse toggle */}
       <div className="flex items-center gap-3 shrink-0">
         <button
           onClick={toggle}
@@ -211,9 +211,6 @@ export function Header() {
           )}
         </button>
         <div className="w-8 lg:hidden" />
-        <h1 className="text-sm font-semibold font-display whitespace-nowrap">
-          {title}
-        </h1>
       </div>
 
       {/* Center: Global search */}
