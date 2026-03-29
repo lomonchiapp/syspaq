@@ -12,22 +12,18 @@ const DEMO_CREDENTIALS = {
 export default function DemoPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, isAuthenticated } = useAuthStore();
+  const { login } = useAuthStore();
   const [error, setError] = useState("");
 
   const tourMode = searchParams.get("tour") === "1";
   const redirectPath = tourMode ? "/dashboard?tour=1" : "/dashboard";
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(redirectPath, { replace: true });
-      return;
-    }
-
     let cancelled = false;
 
     async function autoLogin() {
       try {
+        // Always force a fresh login for the demo, regardless of existing session
         await login(
           DEMO_CREDENTIALS.email,
           DEMO_CREDENTIALS.password,
