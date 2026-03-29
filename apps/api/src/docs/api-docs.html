@@ -123,6 +123,12 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
     <a href="#sucursales">Sucursales</a>
   </div>
   <div class="sidebar-group">
+    <div class="sidebar-group-title">Logistica</div>
+    <a href="#contenedores">Contenedores</a>
+    <a href="#embarcaciones">Embarcaciones</a>
+    <a href="#transferencias">Transferencias</a>
+  </div>
+  <div class="sidebar-group">
     <div class="sidebar-group-title">Utilidades</div>
     <a href="#calculadora">Calculadora de Tarifas</a>
     <a href="#rate-tables">Tablas de Tarifas</a>
@@ -443,23 +449,42 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
     <table>
       <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
       <tr><td><code>trackingNumber</code></td><td>string</td><td class="required">Si</td><td>Numero de rastreo del carrier</td></tr>
-      <tr><td><code>customerId</code></td><td>string</td><td class="required">Si</td><td>UUID del cliente destino</td></tr>
+      <tr><td><code>customerId</code></td><td>string</td><td class="optional">No</td><td>UUID del cliente destino</td></tr>
       <tr><td><code>reference</code></td><td>string</td><td class="optional">No</td><td>Referencia interna u orden</td></tr>
-      <tr><td><code>metadata</code></td><td>object</td><td class="optional">No</td><td>Datos adicionales (tienda, peso, etc.)</td></tr>
+      <tr><td><code>senderName</code></td><td>string</td><td class="optional">No</td><td>Remitente (ej. "AMAZON", "WALMART")</td></tr>
+      <tr><td><code>carrierName</code></td><td>string</td><td class="optional">No</td><td>Transportista (ej. "FLETE COURIER")</td></tr>
+      <tr><td><code>contentDescription</code></td><td>string</td><td class="optional">No</td><td>Descripcion del contenido (ej. "ART PERSONAL")</td></tr>
+      <tr><td><code>pieces</code></td><td>int</td><td class="optional">No</td><td>Cantidad de piezas (default: 1)</td></tr>
+      <tr><td><code>weightLbs</code></td><td>number</td><td class="optional">No</td><td>Peso en libras</td></tr>
+      <tr><td><code>fobValue</code></td><td>number</td><td class="optional">No</td><td>Valor FOB declarado</td></tr>
+      <tr><td><code>fobCurrency</code></td><td>string</td><td class="optional">No</td><td>Moneda FOB (default: "USD")</td></tr>
+      <tr><td><code>collectionType</code></td><td>string</td><td class="optional">No</td><td>Tipo de recoleccion (ej. "Colectar")</td></tr>
+      <tr><td><code>destBranchId</code></td><td>UUID</td><td class="optional">No</td><td>ID de sucursal destino</td></tr>
+      <tr><td><code>warehouseLocation</code></td><td>string</td><td class="optional">No</td><td>Ubicacion en almacen (ej. ".scb 27-3")</td></tr>
+      <tr><td><code>metadata</code></td><td>object</td><td class="optional">No</td><td>Datos adicionales (JSON libre)</td></tr>
     </table>
+  </div>
+
+  <!-- PATCH /v1/shipments/:id -->
+  <div class="endpoint-block">
+    <span class="method patch">PATCH</span>
+    <span class="endpoint-path">/v1/shipments/:id</span>
+    <p>Actualiza los datos de un envio existente. Todos los campos son opcionales.</p>
   </div>
 
   <!-- GET /v1/shipments -->
   <div class="endpoint-block">
     <span class="method get">GET</span>
     <span class="endpoint-path">/v1/shipments</span>
-    <p>Lista envios con paginacion. Los operadores ven todos los envios del tenant; los clientes solo los suyos.</p>
+    <p>Lista envios con paginacion y filtros. Incluye datos de cliente, sucursal destino y conteo de eventos.</p>
     <table>
       <tr><th>Query</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
       <tr><td><code>page</code></td><td>number</td><td class="optional">No</td><td>Pagina (default: 1)</td></tr>
       <tr><td><code>limit</code></td><td>number</td><td class="optional">No</td><td>Resultados por pagina (default: 20)</td></tr>
+      <tr><td><code>search</code></td><td>string</td><td class="optional">No</td><td>Buscar por tracking, remitente o referencia</td></tr>
       <tr><td><code>phase</code></td><td>string</td><td class="optional">No</td><td>Filtrar por fase actual</td></tr>
       <tr><td><code>customerId</code></td><td>string</td><td class="optional">No</td><td>Filtrar por cliente</td></tr>
+      <tr><td><code>destBranchId</code></td><td>string</td><td class="optional">No</td><td>Filtrar por sucursal destino</td></tr>
     </table>
   </div>
 
@@ -947,6 +972,348 @@ td code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:12px;font
 </div>
 </div>
 
+<!-- ==================== CONTENEDORES ==================== -->
+<div class="section" id="contenedores">
+<div class="section-left">
+  <h2>Contenedores</h2>
+  <p>Un contenedor agrupa envios para transporte maritimo o aereo. Puede vincularse a una <a href="#embarcaciones">embarcacion</a> via <code>voyageId</code>. Al agregar paquetes se dispara automaticamente un evento <code>CONTAINERIZED</code>.</p>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/containers</span>
+    <p>Crea un contenedor nuevo.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>number</code></td><td>string</td><td class="required">Si</td><td>Numero de contenedor o AWB</td></tr>
+      <tr><td><code>type</code></td><td>enum</td><td class="required">Si</td><td>MARITIME_FCL, MARITIME_LCL, AIR</td></tr>
+      <tr><td><code>mode</code></td><td>enum</td><td class="required">Si</td><td>SEA o AIR</td></tr>
+      <tr><td><code>origin</code></td><td>string</td><td class="optional">No</td><td>Origen (ej. "MIA")</td></tr>
+      <tr><td><code>destination</code></td><td>string</td><td class="optional">No</td><td>Destino (ej. "SDQ")</td></tr>
+      <tr><td><code>carrier</code></td><td>string</td><td class="optional">No</td><td>Linea naviera o aerolinea</td></tr>
+      <tr><td><code>voyageId</code></td><td>UUID</td><td class="optional">No</td><td>Embarcacion asociada</td></tr>
+      <tr><td><code>sealNumber</code></td><td>string</td><td class="optional">No</td><td>Numero de sello</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/containers</span>
+    <p>Lista contenedores con filtros por status, modo, origen y destino.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/containers/:id</span>
+    <p>Detalle del contenedor con items (paquetes) y embarcacion vinculada.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/containers/:id/items</span>
+    <p>Agrega un envio al contenedor. Dispara evento <code>CONTAINERIZED</code> en el envio.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>shipmentId</code></td><td>UUID</td><td class="required">Si</td><td>ID del envio a agregar</td></tr>
+      <tr><td><code>weightLbs</code></td><td>number</td><td class="optional">No</td><td>Peso en libras</td></tr>
+      <tr><td><code>pieces</code></td><td>int</td><td class="optional">No</td><td>Cantidad de piezas</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method delete">DELETE</span>
+    <span class="endpoint-path">/v1/containers/:id/items/:shipmentId</span>
+    <p>Remueve un envio del contenedor.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/containers/:id/transition</span>
+    <p>Transiciona el estado del contenedor. Flujo lineal. Al transicionar a <code>IN_TRANSIT</code>, <code>IN_PORT</code> o <code>CLEARED</code>, se disparan eventos en todos los envios contenidos.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>status</code></td><td>enum</td><td class="required">Si</td><td>OPEN &rarr; CLOSED &rarr; IN_TRANSIT &rarr; IN_PORT &rarr; IN_CUSTOMS &rarr; CLEARED &rarr; DELIVERED (o CANCELLED desde cualquiera)</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/containers/:id/manifest</span>
+    <p>Manifiesto completo para DGA con datos de clientes, envios y etiquetas.</p>
+  </div>
+</div>
+<div class="section-right">
+  <h4>Crear contenedor</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/containers \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{
+  "number": "EC01-054683",
+  "type": "AIR",
+  "mode": "AIR",
+  "origin": "MIA",
+  "destination": "SDQ",
+  "carrier": "Sunrise Air Cargo",
+  "voyageId": "voyage-uuid-here"
+}'</code></pre>
+  </div>
+
+  <h4>Agregar paquete al contenedor</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/containers/CONTAINER_ID/items \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{
+  "shipmentId": "shipment-uuid",
+  "weightLbs": 2.30,
+  "pieces": 1
+}'</code></pre>
+  </div>
+
+  <h4>Transicionar estado</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/containers/CONTAINER_ID/transition \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{ "status": "IN_TRANSIT" }'</code></pre>
+  </div>
+</div>
+</div>
+
+<!-- ==================== EMBARCACIONES ==================== -->
+<div class="section" id="embarcaciones">
+<div class="section-left">
+  <h2>Embarcaciones (Voyages)</h2>
+  <p>Una embarcacion representa un vuelo o viaje maritimo que transporta uno o mas <a href="#contenedores">contenedores</a>. Agrupa la informacion del transportista, Master AWB, puertos de carga/descarga y fechas.</p>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/voyages</span>
+    <p>Crea una nueva embarcacion.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>number</code></td><td>string</td><td class="required">Si</td><td>Numero de embarcacion (ej. "ES01-001856")</td></tr>
+      <tr><td><code>mode</code></td><td>enum</td><td class="required">Si</td><td>SEA o AIR</td></tr>
+      <tr><td><code>date</code></td><td>ISO date</td><td class="optional">No</td><td>Fecha del documento</td></tr>
+      <tr><td><code>origin</code></td><td>string</td><td class="optional">No</td><td>Puerto/aeropuerto de carga (ej. "MIA")</td></tr>
+      <tr><td><code>destination</code></td><td>string</td><td class="optional">No</td><td>Puerto/aeropuerto de descarga (ej. "SDQ")</td></tr>
+      <tr><td><code>carrier</code></td><td>string</td><td class="optional">No</td><td>Transportista (ej. "Sunrise Air Cargo")</td></tr>
+      <tr><td><code>vesselName</code></td><td>string</td><td class="optional">No</td><td>Nombre del buque/vuelo</td></tr>
+      <tr><td><code>masterAwb</code></td><td>string</td><td class="optional">No</td><td>Numero de Master AWB/BL</td></tr>
+      <tr><td><code>shipper</code></td><td>string</td><td class="optional">No</td><td>Embarcador</td></tr>
+      <tr><td><code>consignee</code></td><td>string</td><td class="optional">No</td><td>Consignatario</td></tr>
+      <tr><td><code>notifyParty</code></td><td>string</td><td class="optional">No</td><td>Notificar a</td></tr>
+      <tr><td><code>agent</code></td><td>string</td><td class="optional">No</td><td>Agente</td></tr>
+      <tr><td><code>departureDate</code></td><td>ISO date</td><td class="optional">No</td><td>Fecha de salida</td></tr>
+      <tr><td><code>arrivalDate</code></td><td>ISO date</td><td class="optional">No</td><td>Fecha de llegada</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/voyages</span>
+    <p>Lista embarcaciones con filtros por status, modo y carrier.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/voyages/:id</span>
+    <p>Detalle de la embarcacion con sus contenedores vinculados.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/voyages/:id/transition</span>
+    <p>Transiciona el estado. Al completar, los contenedores OPEN/CLOSED se transicionan a IN_TRANSIT automaticamente.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>status</code></td><td>enum</td><td class="required">Si</td><td>IN_PROCESS &rarr; COMPLETED (o CANCELLED desde cualquiera)</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/voyages/:id/containers</span>
+    <p>Vincula un contenedor existente a esta embarcacion.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>containerId</code></td><td>UUID</td><td class="required">Si</td><td>ID del contenedor a vincular</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method delete">DELETE</span>
+    <span class="endpoint-path">/v1/voyages/:id/containers/:containerId</span>
+    <p>Desvincula un contenedor de la embarcacion.</p>
+  </div>
+</div>
+<div class="section-right">
+  <h4>Crear embarcacion</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/voyages \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{
+  "number": "ES01-001856",
+  "mode": "AIR",
+  "origin": "MIA",
+  "destination": "SDQ",
+  "carrier": "Sunrise Air Cargo",
+  "masterAwb": "59231335205",
+  "shipper": "Blumbox Miami",
+  "consignee": "Blumbox SDQ",
+  "departureDate": "2026-03-27T00:00:00Z",
+  "arrivalDate": "2026-03-28T00:00:00Z"
+}'</code></pre>
+  </div>
+
+  <h4>Vincular contenedor</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/voyages/VOYAGE_ID/containers \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{ "containerId": "container-uuid" }'</code></pre>
+  </div>
+
+  <h4>Completar embarcacion</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/voyages/VOYAGE_ID/transition \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{ "status": "COMPLETED" }'</code></pre>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TRANSFERENCIAS ==================== -->
+<div class="section" id="transferencias">
+<div class="section-left">
+  <h2>Transferencias</h2>
+  <p>Movimiento de paquetes entre sucursales. Se crea como <code>OUTBOUND</code> en la sucursal origen. Al despachar, el sistema auto-crea la contraparte <code>INBOUND</code> en la sucursal destino y dispara eventos <code>TRANSFER_DISPATCHED</code> en todos los envios. Al recibir, se disparan eventos <code>TRANSFER_RECEIVED</code>.</p>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/transfers</span>
+    <p>Crea una transferencia saliente (OUTBOUND) en estado PENDING.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>number</code></td><td>string</td><td class="required">Si</td><td>Numero de transferencia (ej. "TS02-000001")</td></tr>
+      <tr><td><code>originBranchId</code></td><td>UUID</td><td class="required">Si</td><td>Sucursal de origen</td></tr>
+      <tr><td><code>destBranchId</code></td><td>UUID</td><td class="required">Si</td><td>Sucursal de destino</td></tr>
+      <tr><td><code>notes</code></td><td>string</td><td class="optional">No</td><td>Notas adicionales</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/transfers</span>
+    <p>Lista transferencias con filtros por status, tipo y sucursal.</p>
+    <table>
+      <tr><th>Query</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>status</code></td><td>enum</td><td class="optional">No</td><td>PENDING, DISPATCHED, IN_TRANSIT, RECEIVED, CANCELLED</td></tr>
+      <tr><td><code>type</code></td><td>enum</td><td class="optional">No</td><td>OUTBOUND o INBOUND</td></tr>
+      <tr><td><code>branchId</code></td><td>UUID</td><td class="optional">No</td><td>Filtra por origen O destino</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/v1/transfers/:id</span>
+    <p>Detalle con items (envios), sucursales y transferencia contraparte.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/transfers/:id/items</span>
+    <p>Agrega un envio a la transferencia. Solo en estado PENDING.</p>
+    <table>
+      <tr><th>Parametro</th><th>Tipo</th><th>Requerido</th><th>Descripcion</th></tr>
+      <tr><td><code>shipmentId</code></td><td>UUID</td><td class="required">Si</td><td>ID del envio</td></tr>
+      <tr><td><code>weightLbs</code></td><td>number</td><td class="optional">No</td><td>Peso en libras</td></tr>
+      <tr><td><code>pieces</code></td><td>int</td><td class="optional">No</td><td>Piezas (default: 1)</td></tr>
+    </table>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/transfers/:id/dispatch</span>
+    <p>Despacha la transferencia. Auto-crea la contraparte INBOUND en destino con estado IN_TRANSIT. Dispara eventos <code>TRANSFER_DISPATCHED</code> en todos los envios contenidos.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/transfers/:id/receive</span>
+    <p>Recibe la transferencia en destino. Dispara eventos <code>TRANSFER_RECEIVED</code> en todos los envios.</p>
+  </div>
+
+  <div class="endpoint-block">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/v1/transfers/:id/cancel</span>
+    <p>Cancela la transferencia y su contraparte vinculada.</p>
+  </div>
+</div>
+<div class="section-right">
+  <h4>Crear transferencia</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/transfers \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{
+  "number": "TS02-000001",
+  "originBranchId": "sdq-branch-uuid",
+  "destBranchId": "scb-branch-uuid",
+  "notes": "Transferencia semanal a San Cristobal"
+}'</code></pre>
+  </div>
+
+  <h4>Agregar envio</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code>curl -X POST https://api.syspaq.com/v1/transfers/TRANSFER_ID/items \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid" \
+  -d '{
+  "shipmentId": "shipment-uuid",
+  "weightLbs": 2.30,
+  "pieces": 1
+}'</code></pre>
+  </div>
+
+  <h4>Despachar transferencia</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code># Despacha y auto-crea la contraparte INBOUND
+curl -X POST https://api.syspaq.com/v1/transfers/TRANSFER_ID/dispatch \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid"</code></pre>
+  </div>
+
+  <h4>Recibir transferencia</h4>
+  <div class="code-block">
+    <div class="code-block-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre><code># Recibe la contraparte INBOUND en la sucursal destino
+curl -X POST https://api.syspaq.com/v1/transfers/INBOUND_ID/receive \
+  -H "X-Api-Key: spq_demo_syspaq-sandbox-2025" \
+  -H "X-Tenant-Id: tenant-uuid"</code></pre>
+  </div>
+</div>
+</div>
+
 <!-- ==================== CALCULADORA ==================== -->
 <div class="section" id="calculadora">
 <div class="section-left">
@@ -1339,6 +1706,29 @@ app.post('/webhooks/syspaq', (req, res) => {
     <tr><td><code>RETURNED</code></td><td>Paquete devuelto al remitente</td><td><em>Estado final</em></td></tr>
   </table>
 
+  <h3>Tipos de evento y fase resultante</h3>
+  <table>
+    <tr><th>Evento</th><th>Fase resultante</th><th>Descripcion</th></tr>
+    <tr><td><code>CREATED</code></td><td>CREATED</td><td>Envio registrado</td></tr>
+    <tr><td><code>RECEIVED</code></td><td>RECEIVED</td><td>Recibido en bodega</td></tr>
+    <tr><td><code>WAREHOUSE_RECEIVED</code></td><td>RECEIVED</td><td>Recibido en almacen origen (Miami)</td></tr>
+    <tr><td><code>CONTAINERIZED</code></td><td><em>sin cambio</em></td><td>Agregado a contenedor</td></tr>
+    <tr><td><code>DEPARTED</code></td><td>IN_TRANSIT</td><td>Salio del origen</td></tr>
+    <tr><td><code>ARRIVED</code></td><td>IN_TRANSIT</td><td>Llego al destino</td></tr>
+    <tr><td><code>IN_TRANSIT</code></td><td>IN_TRANSIT</td><td>En transito</td></tr>
+    <tr><td><code>TRANSFER_DISPATCHED</code></td><td>IN_TRANSIT</td><td>Despachado en transferencia entre sucursales</td></tr>
+    <tr><td><code>TRANSFER_RECEIVED</code></td><td>RECEIVED</td><td>Recibido en sucursal destino</td></tr>
+    <tr><td><code>LOCATION_ASSIGNED</code></td><td><em>sin cambio</em></td><td>Ubicacion de almacen asignada (ej. ".scb 27-3")</td></tr>
+    <tr><td><code>CUSTOMS_IN</code></td><td>IN_CUSTOMS</td><td>Ingresado a aduanas</td></tr>
+    <tr><td><code>CUSTOMS_CLEARED</code></td><td>CLEARED</td><td>Desaduanado</td></tr>
+    <tr><td><code>AVAILABLE_FOR_PICKUP</code></td><td>OUT_FOR_DELIVERY</td><td>Disponible para retiro del cliente</td></tr>
+    <tr><td><code>OUT_FOR_DELIVERY</code></td><td>OUT_FOR_DELIVERY</td><td>En ruta de entrega</td></tr>
+    <tr><td><code>INVOICED</code></td><td><em>sin cambio</em></td><td>Factura generada</td></tr>
+    <tr><td><code>DELIVERED</code></td><td>DELIVERED</td><td>Entregado al cliente</td></tr>
+    <tr><td><code>EXCEPTION</code></td><td>EXCEPTION</td><td>Incidencia</td></tr>
+    <tr><td><code>NOTE</code></td><td><em>sin cambio</em></td><td>Nota informativa</td></tr>
+  </table>
+
   <h3>Diagrama de flujo</h3>
   <div class="state-flow">
     <span class="state">CREATED</span><span class="arrow">&rarr;</span>
@@ -1349,7 +1739,7 @@ app.post('/webhooks/syspaq', (req, res) => {
     <span class="state">OUT_FOR_DELIVERY</span><span class="arrow">&rarr;</span>
     <span class="state">DELIVERED</span>
   </div>
-  <p class="muted" style="margin-top:12px">Las fases <code>EXCEPTION</code> y <code>RETURNED</code> pueden activarse desde cualquier fase intermedia.</p>
+  <p class="muted" style="margin-top:12px">Las fases <code>EXCEPTION</code> y <code>RETURNED</code> pueden activarse desde cualquier fase intermedia. Los eventos <code>CONTAINERIZED</code>, <code>LOCATION_ASSIGNED</code>, <code>INVOICED</code> y <code>NOTE</code> no cambian la fase.</p>
 </div>
 <div class="section-right">
   <h4>Flujo tipico de un envio</h4>
